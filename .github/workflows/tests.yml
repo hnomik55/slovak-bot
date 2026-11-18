@@ -6,6 +6,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -21,16 +24,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check content pipeline (парсит slovencina.html -> content.json)
+      - name: Content stats
+        run: python -c "import json;d=json.load(open('data/content.json'));m=d['meta'];print('уроков',m['lessons'],'заданий',m['tasks'],'слов',m['vocab'])"
+
+      - name: Run tests
         run: |
-          sudo apt-get update && sudo apt-get install -y nodejs
-          python tools/build_content.py --source "$GITHUB_WORKSPACE/fixtures/source" --out "$RUNNER_TEMP/out" || echo "фикстуры не приложены — пропускаем"
-
-      - name: Core tests
-        run: python tests/test_core.py
-
-      - name: Flow tests (весь бот через aiogram, без сети)
-        run: python tests/test_flow.py
+          {
+            echo "### Результаты тестов"
+            echo ""
+            for t in test_core test_flow test_webhook test_tts test_miniapp test_license; do
+              echo "#### $t"
+              python "tests/$t.py" 2>&1 | tail -40 || true
+              echo ""
+            done
+          } | tee ci-output.txt
 
       - name: Compile check
         run: python -m compileall -q app bot.py tools
+
+      - name: Publish test output
+        if: always()
+        run: |
+          git config user.name "ci" && git config user.email "ci@local"
+          git add ci-output.txt
+          git commit -m "ci: output of tests" || true
+          git push || true

@@ -61,7 +61,13 @@ jobs:
           TTS_ENABLED: "1"
           STT_ENABLED: "0"
           LOG_LEVEL: INFO
-        run: python bot.py
+        run: |
+          if [ -z "$BOT_TOKEN" ]; then
+            echo "BOT_TOKEN не задан в Secrets — пропускаю запуск."
+            echo "Добавь: Settings -> Secrets and variables -> Actions -> BOT_TOKEN"
+            exit 0
+          fi
+          python bot.py
 
       - name: Save progress (state/slovak.db)
         run: |
