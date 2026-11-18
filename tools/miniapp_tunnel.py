@@ -230,9 +230,59 @@ def start() -> int:
         capture_output=True,
     )
     print("Бот перезапущен — кнопка «Открыть приложение» уже в меню.")
+    notify_new_button(url)
     print("")
     print("Проверить: %s/health" % url)
     return 0
+
+
+def notify_new_button(url: str) -> None:
+    """Сообщает пользователям новую кнопку — старые сообщения в чате уже устарели."""
+    try:
+        import asyncio
+
+        from aiogram import Bot
+        from aiogram.client.default import DefaultBotProperties
+        from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+
+        from app import db
+        from app.config import CONFIG
+
+        if not CONFIG.bot_token:
+            return
+
+        async def run() -> None:
+            db.init_db()
+            tg_bot = Bot(token=CONFIG.bot_token, default=DefaultBotProperties(parse_mode="HTML"))
+            try:
+                rows = db.query("SELECT tg_id FROM users WHERE tg_id != ?", (CONFIG.admin_ids[0] if CONFIG.admin_ids else 0,))
+                kb = InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [
+                            InlineKeyboardButton(
+                                text="📱 Открыть приложение",
+                                web_app=WebAppInfo(url=url),
+                            )
+                        ]
+                    ]
+                )
+                for row in rows:
+                    try:
+                        await tg_bot.send_message(
+                            row["tg_id"],
+                            "🔄 Приложение переехало на новый адрес — вот свежая кнопка.\n"
+                            "Старые кнопки в чате больше не работают.",
+                            reply_markup=kb,
+                        )
+                    except Exception:
+                        pass
+            finally:
+                await tg_bot.session.close()
+
+        asyncio.run(run())
+        print("Пользователям отправлена новая кнопка.")
+    except Exception as exc:
+        print("уведомить пользователей не получилось: %s" % exc)
 
 
 def stop() -> int:
