@@ -42,16 +42,23 @@ async def cb_units(cb: CallbackQuery, bot: Bot) -> None:
         return
     progress = level_progress(cb.from_user.id, lessons)
     stats = content_mod.CONTENT.stats()
+    done_rows = db.query(
+        "SELECT correct, total FROM lesson_progress WHERE user_id = ? AND done = 1",
+        (cb.from_user.id,),
+    )
+    done_tasks = sum(int(r.get("total") or 0) for r in done_rows)
+    done_correct = sum(int(r.get("correct") or 0) for r in done_rows)
     await safe_edit(
         cb.message,
         "📚 <b>Уроки</b>\n\nПройдено: %d из %d · заданий в контенте: %d\n"
-        "Открыт следующий урок, если предыдущий сдан на 80%%.\n\n"
-        "Генератор: %s"
+        "Все уроки доступны сразу — бери любой, отмечай пройденные ✅\n\n"
+        "Заданий решено: <b>%d</b> · верно: %d"
         % (
             content_mod.completed_count(cb.from_user.id),
             len(lessons),
             stats["tasks"],
-            stats["built_at"][:16].replace("T", " "),
+            done_tasks,
+            done_correct,
         ),
         reply_markup=units_menu(content_mod.CONTENT.units, progress),
     )
@@ -72,10 +79,8 @@ async def cb_unit(cb: CallbackQuery, bot: Bot) -> None:
         lid = lesson["id"]
         if content_mod.lesson_done(cb.from_user.id, lid):
             states[lid] = "done"
-        elif content_mod.is_unlocked(cb.from_user.id, lid, lessons):
-            states[lid] = "open"
         else:
-            states[lid] = "locked"
+            states[lid] = "open"
 
     unit = next((u for u in content_mod.CONTENT.units if str(u.get("n")) == str(unit_no)), None)
     title = unit.get("title", "") if unit else ""
@@ -129,7 +134,8 @@ async def cb_lesson(cb: CallbackQuery, bot: Bot, state: FSMContext) -> None:
         return
     if not content_mod.is_unlocked(cb.from_user.id, lesson_id, lessons):
         await cb.message.answer(
-            "🔒 Этот урок пока закрыт. Сдай предыдущий на 80%% — и он откроется.",
+            "🔒 Этот урок пока закрыт. Сдай предыдущий на 80%% — и он откроется.\n"
+            "Все уроки можно открыть сразу: в .env поставь STRICT_GATING=0 и перезапусти бота.",
             reply_markup=back_to(),
         )
         return

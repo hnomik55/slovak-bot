@@ -175,18 +175,24 @@ def lesson_done(user_id: int, lesson_id: str) -> bool:
 
 
 def is_unlocked(user_id: int, lesson_id: str, lessons: Optional[List[Dict[str, Any]]] = None) -> bool:
-    """Урок открыт, если предыдущий пройден на >= 80% (или это первый урок)."""
+    """Доступен ли урок.
+
+    По умолчанию доступны все уроки — учиться можно с любого места.
+    Строгий режим (урок открывается после 80% на предыдущем) включается
+    переменной STRICT_GATING=1 в .env.
+    """
     lessons = lessons or all_lessons(user_id)
     ids = [l["id"] for l in lessons if l.get("id")]
     if lesson_id not in ids:
         return False
+    if not CONFIG.strict_gating:
+        return True
     idx = ids.index(lesson_id)
     if idx == 0:
         return True
     prev = ids[idx - 1]
     if lesson_done(user_id, prev):
         return mastery(user_id, prev) >= MASTERY_THRESHOLD
-    # AI-уроки идут в конце — открыты, если пройден базовый курс хотя бы наполовину
     return False
 
 

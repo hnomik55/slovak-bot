@@ -23,7 +23,7 @@ from typing import Any, Dict, List, Optional
 
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
+from aiogram.types import CallbackQuery, FSInputFile, InlineKeyboardMarkup, Message
 
 from app import db
 from app.keyboards import build_keyboard, choice_keyboard, sk_keyboard
@@ -171,6 +171,7 @@ class Trainer:
     async def _mark_msg(self, message: Message) -> None:
         data = await self._data()
         data["task_msg_id"] = message.message_id
+        data["chat_id"] = message.chat.id
         await self._save(data)
 
     async def _send_match_step(self, message: Message) -> None:
@@ -355,7 +356,14 @@ class Trainer:
             result = RESULT_BAD
         expected = "; ".join("%s — %s" % (p[0], p[1]) for p in pairs)
         await self._after_answer(
-            None, task, "%d/%d" % (good, total), expected, result, kind="match", message=message
+            None,
+            task,
+            "%d/%d" % (good, total),
+            expected,
+            result,
+            kind="match",
+            message=message,
+            edit_message=True,
         )
 
     # ------------------------------------------------------------------ #
@@ -370,6 +378,7 @@ class Trainer:
         result: str,
         kind: str,
         message: Optional[Message] = None,
+        edit_message: bool = False,
     ) -> None:
         data = await self._data()
         idx = int(data.get("idx") or 0)
@@ -399,9 +408,31 @@ class Trainer:
         if cb is not None:
             await safe_answer(cb, body, kb)
         elif message is not None:
-            await safe_edit(message, body, kb)
+            if edit_message:
+                # Сообщение принадлежит боту — правим его на месте.
+                await safe_edit(message, body, kb)
+            else:
+                # Ответ пришёл текстом от пользователя: править его сообщение нельзя
+                # (Telegram запрещает), поэтому разбор уходит новым сообщением,
+                # а кнопки задания убираем.
+                await self._strip_task_keyboard()
+                await message.answer(body, reply_markup=kb)
 
         await self.fsm.set_state(LessonFlow.typing)
+
+    async def _strip_task_keyboard(self) -> None:
+        """Убирает кнопки с сообщения-задания, когда ученик ответил текстом."""
+        data = await self._data()
+        message_id = data.get("task_msg_id")
+        chat_id = data.get("chat_id")
+        if not message_id or not chat_id:
+            return
+        try:
+            await self.bot.edit_message_reply_markup(
+                chat_id=chat_id, message_id=message_id, reply_markup=None
+            )
+        except Exception:
+            pass
 
     def _feedback_text(
         self,
@@ -513,7 +544,7 @@ class Trainer:
         if not path:
             return await cb.answer("Озвучка недоступна", show_alert=True)
         await cb.answer()
-        await cb.message.answer_voice(str(path), caption="🔊 %s" % trim(text, 200))
+        await cb.message.answer_voice(FSInputFile(str(path)), caption="🔊 %s" % trim(text, 200))
 
     # ------------------------------------------------------------------ #
     # Финал

@@ -92,8 +92,8 @@ async def cb_progress(cb: CallbackQuery, bot: Bot) -> None:
         lines.append("➡️ Следующий: <b>%s</b>" % next_lesson.get("title", next_lesson["id"]))
 
     lines.append("")
-    lines.append("<i>Контент: %d уроков, %d заданий, %d слов (собрано %s)</i>" % (
-        stats["lessons"], stats["tasks"], stats["vocab"], stats["built_at"][:10]
+    lines.append("<i>Контент: %d уроков, %d заданий, %d слов</i>" % (
+        stats["lessons"], stats["tasks"], stats["vocab"]
     ))
 
     await safe_edit(

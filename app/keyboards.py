@@ -45,7 +45,7 @@ def units_menu(units: List[Dict[str, Any]], progress: Dict[str, float]) -> Inlin
     for unit in units:
         n = unit.get("n")
         done = progress.get(str(n), 0.0)
-        mark = "✅" if done >= 0.8 else ("🟡" if done > 0 else "🔒")
+        mark = "✅" if done >= 0.8 else ("🟡" if done > 0 else "📘")
         kb.button(
             text="%s %s. %s" % (mark, n, unit.get("title", "")),
             callback_data=f"nav:unit:{n}",
@@ -56,12 +56,12 @@ def units_menu(units: List[Dict[str, Any]], progress: Dict[str, float]) -> Inlin
 
 
 def lessons_menu(unit_no: int, lessons: List[Dict[str, Any]], states: Dict[str, str]) -> InlineKeyboardMarkup:
-    """states: lesson_id -> 'done' | 'open' | 'locked'."""
+    """states: lesson_id -> 'done' | 'open'."""
     kb = InlineKeyboardBuilder()
     for lesson in lessons:
         lid = lesson["id"]
-        state = states.get(lid, "locked")
-        icon = {"done": "✅", "open": "▶️", "locked": "🔒"}.get(state, "🔒")
+        state = states.get(lid, "open")
+        icon = "✅" if state == "done" else "▶️"
         kb.button(text="%s %s. %s" % (icon, lid, lesson.get("title", "")), callback_data=f"nav:lesson:{lid}")
     kb.adjust(1)
     kb.row(InlineKeyboardButton(text="⬅️ К юнитам", callback_data="nav:units"))

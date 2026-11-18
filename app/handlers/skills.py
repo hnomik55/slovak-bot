@@ -14,7 +14,13 @@ from aiogram import Bot, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
+from aiogram.types import (
+    CallbackQuery,
+    FSInputFile,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+)
 
 from app import content as content_mod
 from app import db
@@ -95,7 +101,7 @@ async def cb_listen_start(cb: CallbackQuery, bot: Bot, state: FSMContext) -> Non
     text = "🎧 <b>Послушай и напиши, что услышал</b>\n\n"
     if path:
         await cb.message.answer_voice(
-            str(path),
+            FSInputFile(str(path)),
             caption="🔊 Словацкий текст",
             reply_markup=InlineKeyboardMarkup(
                 inline_keyboard=[
@@ -116,7 +122,7 @@ async def cb_listen_again(cb: CallbackQuery, bot: Bot, state: FSMContext) -> Non
     source = data.get("source") or ""
     path = await TTS.speech(source)
     if path:
-        await cb.message.answer_voice(str(path), caption="🔊 %s" % source)
+        await cb.message.answer_voice(FSInputFile(str(path)), caption="🔊 %s" % source)
 
 
 @router.message(SkillFlow.listen, F.text)

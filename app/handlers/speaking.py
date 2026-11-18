@@ -16,7 +16,14 @@ from typing import List
 from aiogram import Bot, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message, Voice
+from aiogram.types import (
+    CallbackQuery,
+    FSInputFile,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+    Voice,
+)
 
 from app import content as content_mod
 from app import db
@@ -86,7 +93,7 @@ async def cb_speaking_topic(cb: CallbackQuery, bot: Bot, state: FSMContext) -> N
 
     path = await TTS.speech(opener)
     if path:
-        await cb.message.answer_voice(str(path), caption="🗣 %s" % opener)
+        await cb.message.answer_voice(FSInputFile(str(path)), caption="🗣 %s" % opener)
     await cb.message.answer(
         "<b>ИИ:</b> %s\n<i>%s</i>\n\nОтветь голосом или текстом." % (opener, translation),
         reply_markup=_speaking_kb(),
@@ -151,7 +158,7 @@ async def msg_speaking_turn(message: Message, bot: Bot, state: FSMContext) -> No
 
     path = await TTS.speech(reply.get("reply", ""))
     if path:
-        await message.answer_voice(str(path), caption="🗣 ИИ")
+        await message.answer_voice(FSInputFile(str(path)), caption="🗣 ИИ")
     await message.answer("\n".join(lines), reply_markup=_speaking_kb())
 
 
@@ -202,7 +209,7 @@ async def cb_repeat_pick(cb: CallbackQuery, bot: Bot, state: FSMContext) -> None
     await state.update_data(phrase=phrase)
     path = await TTS.speech(phrase)
     if path:
-        await cb.message.answer_voice(str(path), caption="🔊 Повтори эту фразу голосом")
+        await cb.message.answer_voice(FSInputFile(str(path)), caption="🔊 Повтори эту фразу голосом")
     await cb.message.answer(
         "🎤 <b>Повтори фразу голосом</b>\n\n<code>%s</code>\n\nСкажи её вслух — сравню, что услышал." % phrase,
         reply_markup=back_to("⬅️ В меню", "nav:menu"),

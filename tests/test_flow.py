@@ -82,6 +82,14 @@ class FakeSession:
     def texts(self) -> List[str]:
         return [c.text for c in self.calls if isinstance(c, (SendMessage, EditMessageText)) and c.text]
 
+    def sent_texts(self) -> List[str]:
+        """Только НОВЫЕ сообщения (ответы бота), без правок существующих."""
+        return [c.text for c in self.calls if isinstance(c, SendMessage) and c.text]
+
+    def last_sent_text(self) -> str:
+        texts = self.sent_texts()
+        return texts[-1] if texts else ""
+
     def last_text(self) -> str:
         texts = self.texts()
         return texts[-1] if texts else ""
@@ -250,6 +258,13 @@ async def main() -> int:
     check("пришло задание на ввод", "⌨️" in session.last_text() or "Напиши" in session.last_text(), session.last_text()[:120])
     await send("som")
     check("ответ разобран", "Верно" in session.last_text() or "Почти" in session.last_text(), session.last_text()[:120])
+    # Регрессия: ответ текстом нельзя разбирать правкой сообщения ученика —
+    # Telegram это запрещает, и разбор молча пропадал. Нужен НОВОЕ сообщение.
+    check(
+        "разбор пришёл новым сообщением, а не правкой",
+        "Верно" in session.last_sent_text() or "Почти" in session.last_sent_text(),
+        session.last_sent_text()[:120],
+    )
 
     print("\n== Слова (SRS) ==")
     await press("nav:vocab")

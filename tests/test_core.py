@@ -130,15 +130,32 @@ db.bump_lesson(12345, "1b", 5, 6, 0.83)
 check("прогресс урока сохранён", content_mod.lesson_done(12345, "1b"))
 check("mastery посчитан", abs(content_mod.mastery(12345, "1b") - 0.83) < 0.01)
 
-# Разблокировка: отдельный пользователь, чтобы не мешать другим проверкам
+# Разблокировка: по умолчанию открыты все уроки
 db.ensure_user(999)
 lessons = content.lessons
-first, second = lessons[0]["id"], lessons[1]["id"]
-check("первый урок открыт", content_mod.is_unlocked(999, first, lessons))
-db.bump_lesson(999, first, 9, 10, 0.9)
-check("второй урок открылся после 80%", content_mod.is_unlocked(999, second, lessons))
-db.bump_lesson(999, second, 2, 10, 0.2)
-check("третий урок закрыт при слабом результате", not content_mod.is_unlocked(999, lessons[2]["id"], lessons))
+check("первый урок открыт", content_mod.is_unlocked(999, lessons[0]["id"], lessons))
+check(
+    "все уроки доступны сразу",
+    all(content_mod.is_unlocked(999, l["id"], lessons) for l in lessons),
+)
+
+# Строгий режим: урок открыт только после 80% на предыдущем
+from app.config import CONFIG  # noqa: E402
+
+CONFIG.strict_gating = True
+try:
+    db.bump_lesson(999, lessons[0]["id"], 9, 10, 0.9)
+    check(
+        "строгий режим: следующий открылся после 80%",
+        content_mod.is_unlocked(999, lessons[1]["id"], lessons),
+    )
+    db.bump_lesson(999, lessons[1]["id"], 2, 10, 0.2)
+    check(
+        "строгий режим: после слабого результата закрыт",
+        not content_mod.is_unlocked(999, lessons[2]["id"], lessons),
+    )
+finally:
+    CONFIG.strict_gating = False
 
 # Словарь
 rows = db.query("SELECT COUNT(*) AS n FROM vocab")

@@ -111,8 +111,7 @@ async def cmd_stats(message: Message) -> None:
         "📊 <b>Статистика</b>\n\n"
         "Юзеров: %s (активных за 7 дней: %s)\n"
         "Попыток: %s\n"
-        "Контент: %s уроков, %s заданий, %s слов\n"
-        "Сборка: %s"
+        "Контент: %s уроков, %s заданий, %s слов"
         % (
             users["n"],
             active["n"],
@@ -120,7 +119,6 @@ async def cmd_stats(message: Message) -> None:
             stats["lessons"],
             stats["tasks"],
             stats["vocab"],
-            stats["built_at"],
         )
     )
 

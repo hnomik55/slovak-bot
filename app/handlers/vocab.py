@@ -13,7 +13,13 @@ from aiogram import Bot, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
+from aiogram.types import (
+    CallbackQuery,
+    FSInputFile,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+)
 
 from app import db
 from app.keyboards import back_to
@@ -250,7 +256,7 @@ async def cb_speak_word(cb: CallbackQuery, bot: Bot, state: FSMContext) -> None:
     path = await TTS.speech(row["sk"])
     if not path:
         return await cb.answer("Озвучка недоступна", show_alert=True)
-    await cb.message.answer_voice(str(path), caption="🔊 %s" % row["sk"])
+    await cb.message.answer_voice(FSInputFile(str(path)), caption="🔊 %s" % row["sk"])
 
 
 @router.callback_query(F.data == "vc:stop")

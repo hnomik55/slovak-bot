@@ -97,12 +97,25 @@ class Config:
     # --- Голос ---
     tts_enabled: bool = field(default_factory=lambda: _bool("TTS_ENABLED", True))
     tts_voice: str = field(
-        default_factory=lambda: os.environ.get("TTS_VOICE", "sk-SK-MiroslavNeural").strip()
+        default_factory=lambda: os.environ.get("TTS_VOICE", "sk-SK-LukasNeural").strip()
+    )
+    # Запасные голоса и источники: если основной недоступен — пробуем следующие.
+    tts_fallback_voices: List[str] = field(
+        default_factory=lambda: [
+            v.strip()
+            for v in os.environ.get(
+                "TTS_FALLBACK_VOICES", "sk-SK-ViktoriaNeural,sk-SK-LukasNeural"
+            ).split(",")
+            if v.strip()
+        ]
     )
     stt_enabled: bool = field(default_factory=lambda: _bool("STT_ENABLED", True))
     stt_model: str = field(default_factory=lambda: os.environ.get("STT_MODEL", "small").strip())
 
     # --- Прочее ---
+    # Строгие гейты (урок открыт после 80% на предыдущем). По умолчанию выключено:
+    # все уроки доступны сразу.
+    strict_gating: bool = field(default_factory=lambda: _bool("STRICT_GATING", False))
     daily_minutes: int = field(default_factory=lambda: _int("DAILY_MINUTES", 30))
     reminder_time: str = field(default_factory=lambda: os.environ.get("REMINDER_TIME", "21:00").strip())
     reminder_tz: str = field(default_factory=lambda: os.environ.get("REMINDER_TZ", "Europe/Bratislava").strip())

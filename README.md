@@ -32,9 +32,12 @@ python bot.py
 Проверить, что всё живо:
 
 ```bash
-python tests\test_core.py     # 43 проверки ядра: контент, оценки, SRS, БД
-python tests\test_flow.py     # 30 проверок сквозного сценария через aiogram
+python tests\test_core.py     # 44 проверки ядра: контент, оценки, SRS, БД, гейты
+python tests\test_flow.py     # 35 проверок сквозного сценария через aiogram
+python tests\test_webhook.py  # 9 проверок режима вебхука
+python tests\test_tts.py      # 8 проверок озвучки (синтез, кэш, голоса)
 python tools\dry_run.py       # запуск без Telegram: БД, контент, планировщик
+python tools\test_voice.py    # прислать тестовое голосовое сообщение в чат
 ```
 
 ## Управление ботом
@@ -138,8 +141,10 @@ python tools\botctl.py restart
 | `AI_API_KEY` | — | без него работает локальная часть |
 | `AI_MODEL` | `gpt-4o-mini` | модель |
 | `AI_MODEL_FAST` | = AI_MODEL | для диалогов и разборов |
-| `TTS_VOICE` | `sk-SK-MiroslavNeural` | словацкий голос edge-tts |
+| `TTS_VOICE` | `sk-SK-LukasNeural` | словацкий голос edge-tts (Miroslav/Venu **не существуют** — edge-tts молча отдаёт пустой файл) |
+| `TTS_FALLBACK_VOICES` | `sk-SK-ViktoriaNeural,sk-SK-LukasNeural` | если основной голос недоступен |
 | `STT_MODEL` | `small` | faster-whisper: tiny/base/small/medium |
+| `STRICT_GATING` | `0` | `0` — все уроки доступны сразу; `1` — урок после 80% на предыдущем |
 | `DAILY_MINUTES` | `30` | норма в день |
 | `REMINDER_TIME` | `21:00` | время напоминания |
 | `REMINDER_TZ` | `Europe/Bratislava` | часовой пояс |
