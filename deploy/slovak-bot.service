@@ -1,0 +1,24 @@
+[Unit]
+Description=Slovencina - Telegram bot for learning Slovak
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=slovak
+Group=slovak
+WorkingDirectory=/opt/slovak-bot
+Environment="PYTHONUNBUFFERED=1"
+Environment="PYTHONIOENCODING=utf-8"
+ExecStart=/opt/slovak-bot/.venv/bin/python bot.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/opt/slovak-bot/data/bot.log
+StandardError=append:/opt/slovak-bot/data/bot.log
+
+# Жёсткие лимиты, чтобы бот не съел машину
+MemoryMax=1G
+CPUQuota=50%
+
+[Install]
+WantedBy=multi-user.target

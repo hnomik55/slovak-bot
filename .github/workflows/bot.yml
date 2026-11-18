@@ -1,0 +1,80 @@
+name: slovak bot
+
+# Бот живёт в GitHub Actions: раз в N минут просыпается, забирает накопленные
+# сообщения Telegram и отвечает, затем выключается и сохраняет состояние.
+#
+# Почему это работает бесплатно: в ПУБЛИЧНОМ репозитории минуты Actions
+# не тарифицируются. В приватном — даётся 2 000 минут в месяц, а боту
+# на 24/7 нужно 43 200, поэтому приватный репозиторий не подходит.
+#
+# Telegram хранит непрочитанные апдейты 24 часа, поэтому ответ приходит
+# с задержкой в пределах расписания (обычно 0–5 минут).
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "bot.py"
+      - "data/content.json"
+
+concurrency:
+  group: slovak-bot
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Show content stats
+        run: python -c "import json;d=json.load(open('data/content.json'));m=d['meta'];print('уроков',m['lessons'],'заданий',m['tasks'],'слов',m['vocab'])"
+
+      - name: Run bot (5 minutes)
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          ADMIN_IDS: ${{ secrets.ADMIN_IDS }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          AI_BASE_URL: ${{ vars.AI_BASE_URL }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_MODEL: ${{ vars.AI_MODEL }}
+          MODE: polling
+          RUN_SECONDS: 240
+          DB_PATH: state/slovak.db
+          TTS_ENABLED: "1"
+          STT_ENABLED: "0"
+          LOG_LEVEL: INFO
+        run: python bot.py
+
+      - name: Save progress (state/slovak.db)
+        run: |
+          python - <<'PY'
+          import os, sqlite3
+          if os.path.exists("state/slovak.db"):
+              con = sqlite3.connect("state/slovak.db")
+              con.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+              con.close()
+              print("БД сохранена")
+          PY
+          git config user.name "slovak-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A state || true
+          git commit -m "state: прогресс ученика" || echo "изменений нет"
+          git push || echo "не удалось запушить (возможен конфликт)"

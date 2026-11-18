@@ -1,0 +1,103 @@
+"""Flask-приложение для режима вебхука.
+
+Схема работы:
+  Telegram --POST--> /bot/<секрет>  -->  dp.feed_update()  -->  бот отвечает
+
+Почему Flask: он предустановлен на бесплатных хостингах (PythonAnywhere, Render,
+Railway, Fly.io) и поднимается там как WSGI-приложение без ручной настройки.
+
+Требования к хостингу:
+  * постоянный адрес с HTTPS (все бесплатные платформы дают его сразу);
+  * веб-приложение (не «скрипт»), живёт постоянно;
+  * чтобы бот просыпался по расписанию — ежедневная задача, дёргающая /cron/<секрет>.
+
+Важно: event loop один и тот же на весь процесс. aiohttp-сессия aiogram
+привязана к циклу, поэтому новый цикл на каждый запрос ломает отправку.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import logging
+from typing import Any, Optional
+
+from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.types import Update
+from flask import Flask, jsonify, request
+
+from app.config import CONFIG
+
+log = logging.getLogger("webhook")
+
+# Один loop на процесс
+_LOOP = asyncio.new_event_loop()
+asyncio.set_event_loop(_LOOP)
+
+
+def _run(coro):
+    return _LOOP.run_until_complete(coro)
+
+
+def _secret_ok(candidate: str) -> bool:
+    secret = CONFIG.webhook_secret
+    if not secret:
+        return True  # секрет не задан — пропускаем (но это небезопасно)
+    return candidate == secret
+
+
+def create_app(bot: Bot, dp: Dispatcher) -> Flask:
+    app = Flask(__name__)
+    app.config["JSON_AS_ASCII"] = False
+
+    @app.route("/bot/<secret>", methods=["POST"])
+    def telegram_webhook(secret: str):
+        if not _secret_ok(secret):
+            log.warning("запрос с неверным секретом — отклонён")
+            return jsonify({"ok": False}), 403
+        try:
+            data = request.get_json(force=True, silent=True) or {}
+            update = Update.model_validate(data, context={"bot": bot})
+            _run(dp.feed_update(bot, update))
+            return jsonify({"ok": True})
+        except Exception as exc:
+            log.exception("ошибка обработки апдейта: %s", exc)
+            return jsonify({"ok": False, "error": str(exc)}), 500
+
+    @app.route("/cron/<secret>", methods=["GET"])
+    def cron(secret: str):
+        """Точка для внешнего крона: проверяет, не пора ли напомнить."""
+        if not _secret_ok(secret):
+            return jsonify({"ok": False}), 403
+        try:
+            from app.services.reminders import catch_up
+
+            _run(catch_up(bot))
+            return jsonify({"ok": True})
+        except Exception as exc:
+            log.exception("cron-ошибка: %s", exc)
+            return jsonify({"ok": False, "error": str(exc)}), 500
+
+    @app.route("/health", methods=["GET"])
+    def health():
+        return jsonify({"ok": True, "mode": CONFIG.mode})
+
+    return app
+
+
+def build_wsgi_app() -> Flask:
+    """Собирает приложение для gunicorn/uWSGI.
+
+    Точка входа лежит в файле wsgi.py в корне проекта:
+        gunicorn --workers 1 --bind 0.0.0.0:8000 wsgi:app
+    Один воркер обязателен: состояние бота (FSM, сессия) живёт в процессе.
+    """
+    from bot import build_dispatcher, startup
+
+    bot = Bot(token=CONFIG.bot_token, default=DefaultBotProperties(parse_mode="HTML"))
+    dp = build_dispatcher()
+    try:
+        _run(startup(bot))
+    except Exception as exc:
+        log.warning("инициализация не завершилась: %s", exc)
+    return create_app(bot, dp)

@@ -1,0 +1,15 @@
+# По умолчанию — LF, чтобы шелловые скрипты работали на Linux-хостинге
+* text=auto eol=lf
+
+# Windows-скрипты — CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Двоичное
+*.db binary
+*.db-wal binary
+*.db-shm binary
+*.mp3 binary
+*.pdf binary
+*.png binary
+*.jpg binary

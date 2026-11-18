@@ -1,0 +1,849 @@
+#separator:tab
+#html:false
+# Словацкий	Русский
+áno	да
+nie	нет
+ahoj	привет / пока
+čau	привет / пока (разг.)
+dobrý deň	здравствуйте
+dobré ráno	доброе утро
+dobrý večer	добрый вечер
+dobrú noc	спокойной ночи
+dovidenia	до свидания
+ďakujem	спасибо
+prosím	пожалуйста
+prepáčte	извините
+prepáč	извини
+nerozumiem	я не понимаю
+teší ma	приятно познакомиться
+pán	господин
+pani	госпожа
+meno	имя
+priezvisko	фамилия
+adresa	адрес
+telefónne číslo	номер телефона
+ja	я
+ty	ты
+on	он
+ona	она
+ono	оно
+my	мы
+vy	вы
+oni	они
+môj / moja / moje	мой / моя / моё
+tvoj / tvoja / tvoje	твой / твоя / твоё
+jeho	его
+jej	её
+náš	наш
+váš	ваш
+ich	их
+to	это
+tento	этот
+ten	тот
+niečo	что-то
+niekto	кто-то
+nič	ничего
+nikto	никто
+všetko	всё
+kto	кто
+čo	что
+kde	где
+kam	куда
+odkiaľ	откуда
+kedy	когда
+prečo	почему
+ako	как
+koľko	сколько
+aký	какой
+ktorý	который
+a	и
+ale	но
+alebo	или
+aj	и / тоже
+tiež	тоже
+len	только
+veľmi	очень
+trochu	немного
+tu	здесь
+tam	там
+teraz	сейчас
+potom	потом
+dnes	сегодня
+zajtra	завтра
+včera	вчера
+vždy	всегда
+nikdy	никогда
+často	часто
+niekedy	иногда
+už	уже
+ešte	ещё
+s	с
+bez	без
+v / vo	в
+na	на
+do	в (куда) / до
+z / zo	из
+pre	для
+o	о
+pri	при / возле
+rodina	семья
+otec	отец
+mama	мама
+matka	мать
+rodičia	родители (!)
+brat	брат
+sestra	сестра
+súrodenci	братья и сёстры
+syn	сын
+dcéra	дочь
+starý otec / dedo	дедушка
+stará mama / babka	бабушка
+manžel	муж
+manželka	жена
+dieťa	ребёнок
+deti	дети
+muž	мужчина
+žena	женщина
+chlapec	мальчик / парень
+dievča	девочка / девушка
+kamarát	друг
+kamarátka	подруга
+človek	человек
+ľudia	люди
+študent / študentka	студент / студентка
+učiteľ / učiteľka	учитель / учительница
+lekár / lekárka	врач
+inžinier	инженер
+ekonóm / ekonómka	экономист
+predavač / predavačka	продавец
+vodič	водитель
+kuchár	повар
+robotník	рабочий
+zvárač	сварщик
+programátor	программист
+deň	день
+týždeň	неделя
+mesiac	месяц
+rok	год
+hodina	час / урок
+minúta	минута
+ráno	утро / утром
+obed	обед
+poobede	после обеда
+večer	вечер / вечером
+noc	ночь
+pondelok	понедельник
+utorok	вторник
+streda	среда
+štvrtok	четверг
+piatok	пятница
+sobota	суббота
+nedeľa	воскресенье
+január	январь
+február	февраль
+marec	март
+apríl	апрель
+máj	май
+jún	июнь
+júl	июль
+august	август
+september	сентябрь
+október	октябрь
+november	ноябрь
+december	декабрь
+jar	весна
+leto	лето
+jeseň	осень
+zima	зима / холодно
+jedlo	еда / блюдо
+raňajky	завтрак
+večera	ужин
+chlieb	хлеб
+rožok	булочка
+maslo	масло
+syr	сыр
+mlieko	молоко
+vajce	яйцо
+mäso	мясо
+kura	курица
+ryba	рыба
+zemiaky	картошка
+ryža	рис
+cestoviny	макароны
+polievka	суп
+šalát	салат
+ovocie	фрукты (!)
+zelenina	овощи
+jablko	яблоко
+banán	банан
+pomaranč	апельсин
+paradajka	помидор
+uhorka	огурец
+cibuľa	лук
+cukor	сахар
+soľ	соль
+voda	вода
+káva	кофе
+čaj	чай
+džús	сок
+pivo	пиво
+víno	вино
+dom	дом
+byt	квартира
+izba	комната (!)
+kuchyňa	кухня
+kúpeľňa	ванная
+spálňa	спальня
+záchod	туалет
+okno	окно
+dvere	дверь
+stôl	стол
+stolička	стул
+posteľ	кровать
+skriňa	шкаф
+kľúč	ключ
+mesto	город
+dedina	деревня
+ulica	улица
+námestie	площадь
+obchod	магазин
+potraviny	продуктовый магазин
+pošta	почта
+banka	банк
+lekáreň	аптека (!)
+nemocnica	больница
+škola	школа
+univerzita	университет
+reštaurácia	ресторан
+kaviareň	кафе
+hotel	гостиница
+stanica	вокзал
+zastávka	остановка
+autobus	автобус
+električka	трамвай
+vlak	поезд
+auto	машина
+letisko	аэропорт
+park	парк
+trieda	класс
+kniha	книга
+zošit	тетрадь
+pero	ручка
+ceruzka	карандаш
+úloha	задание
+otázka	вопрос
+odpoveď	ответ
+slovo	слово
+veta	предложение
+jazyk	язык
+slovenčina	словацкий язык
+ruština	русский язык
+angličtina	английский язык
+matematika	математика
+fyzika	физика
+informatika	информатика
+biely	белый
+čierny	чёрный
+červený	красный
+modrý	синий
+zelený	зелёный
+žltý	жёлтый
+sivý	серый
+hnedý	коричневый
+dobrý	хороший
+zlý	плохой
+veľký	большой
+malý	маленький
+nový	новый
+starý	старый
+mladý	молодой
+pekný	красивый
+krásny	прекрасный
+drahý	дорогой
+lacný	дешёвый
+teplý	тёплый
+studený	холодный
+horúci	горячий
+rýchly	быстрый
+pomalý	медленный
+ľahký	лёгкий
+ťažký	тяжёлый / трудный
+dlhý	длинный
+krátky	короткий
+unavený	уставший
+šťastný	счастливый
+hladný	голодный
+smädný	хочет пить
+čerstvý	свежий (!)
+úžasný	потрясающий (!)
+byť	быть
+mať	иметь
+volať sa	называться (звать)
+bývať	жить (где)
+žiť	жить
+robiť	делать
+pracovať	работать
+študovať	учиться / изучать
+učiť sa	учиться / учить
+hovoriť	говорить
+rozumieť	понимать
+vedieť	знать / уметь
+poznať	знать (кого-то, что-то)
+chcieť	хотеть
+môcť	мочь
+musieť	быть должным
+ísť	идти / ехать
+prísť	прийти
+jesť	есть (кушать)
+piť	пить
+spať	спать
+čítať	читать
+písať	писать
+počúvať	слушать
+pozerať	смотреть
+vidieť	видеть
+kupovať	покупать
+platiť	платить
+čakať	ждать
+hľadať	искать (!)
+otvoriť	открыть
+zatvoriť	закрыть
+ľúbiť	любить (кого-то)
+mať rád	любить / нравиться
+variť	готовить (еду)
+cestovať	путешествовать
+telo	тело
+hlava	голова
+vlasy	волосы
+oko / oči	глаз / глаза
+ucho	ухо
+nos	нос
+ústa	рот
+zub	зуб
+krk	шея
+ruka	рука
+noha	нога
+prst	палец
+chrbát	спина
+brucho	живот
+srdce	сердце
+zdravie	здоровье
+zdravý	здоровый
+chorý	больной
+choroba	болезнь
+bolesť	боль
+Bolí ma hlava.	У меня болит голова.
+teplota	температура
+chrípka	грипп
+nádcha	насморк
+kašeľ	кашель
+liek	лекарство
+tabletka	таблетка
+recept	рецепт
+zubár	стоматолог
+ambulancia	кабинет врача
+pohotovosť	неотложная помощь
+sanitka	машина скорой помощи
+poistenie	страховка
+oblečenie	одежда
+tričko	футболка
+košeľa	рубашка
+sveter	свитер
+bunda	куртка
+kabát	пальто
+nohavice	брюки
+rifle	джинсы
+sukňa	юбка
+šaty	платье
+topánky	обувь
+ponožky	носки
+čiapka	шапка
+rukavice	перчатки
+šál	шарф
+veľkosť	размер
+obliecť sa	одеться
+počasie	погода
+slnko	солнце
+Svieti slnko.	Светит солнце.
+dážď	дождь
+Prší.	Идёт дождь.
+sneh	снег
+Sneží.	Идёт снег.
+vietor	ветер
+oblak	облако
+zamračené	пасмурно
+teplo	тепло
+stupeň	градус
+predpoveď počasia	прогноз погоды
+príroda	природа
+hora	гора
+les	лес
+rieka	река
+jazero	озеро
+more	море
+strom	дерево
+kvet	цветок
+zviera	животное
+pes	собака
+mačka	кошка
+vták	птица
+cesta	дорога / поездка
+lístok	билет
+cestovný poriadok	расписание (транспорта)
+odchod	отправление
+príchod	прибытие
+nástupište	платформа
+meškanie	опоздание
+prestupovať	пересаживаться
+taxík	такси
+bicykel	велосипед
+lietadlo	самолёт
+kufor	чемодан
+batožina	багаж
+pas	паспорт
+hranica	граница
+ubytovanie	жильё
+rezervácia	бронь
+peniaze	деньги
+cena	цена
+zľava	скидка
+hotovosť	наличные
+karta	карта
+bankomat	банкомат
+účet	счёт
+pokladňa	касса
+nákup	покупка
+nakupovať	делать покупки
+stáť	стоить / стоять
+zaplatiť	заплатить
+vrátiť	вернуть
+voľný čas	свободное время
+šport	спорт
+futbal	футбол
+plávať	плавать
+behať	бегать
+hrať	играть
+hudba	музыка
+kino	кино
+divadlo	театр
+koncert	концерт
+výlet	поездка / экскурсия
+dovolenka	отпуск
+prázdniny	каникулы
+víkend	выходные
+stretnúť sa	встретиться
+fotografovať	фотографировать
+práca	работа
+zamestnanie	место работы
+firma	фирма
+kancelária	офис
+šéf	начальник
+kolega / kolegyňa	коллега
+plat	зарплата
+pracovný čas	рабочее время
+brigáda	подработка
+životopis	резюме
+pohovor	собеседование
+fakulta	факультет
+študijný program	учебная программа
+prednáška	лекция
+seminár	семинар
+skúška	экзамен
+známka	оценка
+rozvrh	расписание (занятий)
+semester	семестр
+ročník	курс / класс (год обучения)
+knižnica	библиотека
+internát	общежитие
+menza	студенческая столовая
+štipendium	стипендия
+prihláška	заявление (на поступление)
+zápis	зачисление
+vysvedčenie	аттестат
+maturita	выпускной экзамен
+rád / rada	рад / рада
+smutný	грустный
+nahnevaný	злой (сердитый)
+nervózny	нервный
+pokojný	спокойный
+prekvapený	удивлённый
+sklamaný	разочарованный
+mať strach	бояться
+tešiť sa	радоваться / ждать с нетерпением
+páčiť sa	нравиться
+prvý	первый
+druhý	второй
+tretí	третий
+štvrtý	четвёртый
+piaty	пятый
+šiesty	шестой
+siedmy	седьмой
+ôsmy	восьмой
+deviaty	девятый
+desiaty	десятый
+minulý týždeň	на прошлой неделе
+budúci rok	в следующем году
+o hodinu	через час
+pred rokom	год назад
+cez víkend	на выходных
+každý deň	каждый день
+zriedka	редко
+skoro	рано / почти
+neskoro	поздно
+včas	вовремя
+robiť – urobiť	делать – сделать
+písať – napísať	писать – написать
+čítať – prečítať	читать – прочитать
+kupovať – kúpiť	покупать – купить
+platiť – zaplatiť	платить – заплатить
+jesť – zjesť	есть – съесть
+piť – vypiť	пить – выпить
+učiť sa – naučiť sa	учить – выучить
+hovoriť – povedať	говорить – сказать
+dávať – dať	давать – дать
+brať – vziať	брать – взять
+otvárať – otvoriť	открывать – открыть
+zatvárať – zatvoriť	закрывать – закрыть
+prichádzať – prísť	приходить – прийти
+odchádzať – odísť	уходить – уйти
+vstávať – vstať	вставать – встать
+posielať – poslať	отправлять – отправить
+pomáhať – pomôcť	помогать – помочь
+začínať – začať	начинать – начать
+končiť – skončiť	заканчивать – закончить
+zabúdať – zabudnúť	забывать – забыть
+pamätať si	помнить
+dôležitý	важный
+zaujímavý	интересный
+nudný	скучный
+jednoduchý	простой
+zložitý	сложный
+správny	правильный
+chybný	ошибочный
+rovnaký	одинаковый
+iný	другой
+celý	весь / целый
+plný	полный
+prázdny	пустой
+otvorený	открытый
+zatvorený	закрытый
+voľný	свободный
+obsadený	занятый
+blízky	близкий
+ďaleký	далёкий
+čistý	чистый
+špinavý	грязный
+tichý	тихий
+hlučný	шумный
+pretože	потому что
+lebo	потому что (разг.)
+preto	поэтому
+keď	когда / если
+ak	если
+že	что (союз)
+aby	чтобы
+najprv	сначала
+nakoniec	наконец
+napríklad	например
+asi	наверное
+určite	точно / обязательно
+možno	может быть
+samozrejme	конечно
+hlavne	главное / особенно
+spolu	вместе
+sám / sama	сам / сама
+názor	мнение
+Myslím si, že…	Я думаю, что…
+podľa mňa	по-моему
+súhlasiť	соглашаться
+nesúhlasiť	не соглашаться
+výhoda	преимущество
+nevýhoda	недостаток
+dôvod	причина (довод)
+príčina	причина
+následok	последствие
+problém	проблема
+riešenie	решение (задачи)
+možnosť	возможность
+skúsenosť	опыт
+zážitok	впечатление
+cieľ	цель
+rozhodnutie	решение (выбор)
+rozhodnúť sa	решить
+vybrať si	выбрать
+porovnať	сравнить
+vysvetliť	объяснить
+presvedčiť	убедить
+odporučiť	порекомендовать
+zistiť	выяснить
+zaujímať sa o	интересоваться чем-то
+dúfať	надеяться
+obávať sa	опасаться
+očakávať	ожидать
+zvyknúť si	привыкнуть
+vzdelanie	образование
+stredná škola	средняя школа
+vysoká škola	вуз
+bakalárske štúdium	бакалавриат
+uchádzač	абитуриент
+prijímacie konanie	приёмная кампания
+prijatý	принятый
+odbor	специальность / направление
+predmet	предмет
+povinný	обязательный
+voliteľný	по выбору
+kredit	кредит (зачётная единица)
+zápočet	зачёт
+cvičenie	практическое занятие
+laboratórium	лаборатория
+výskum	исследование
+bakalárska práca	бакалаврская работа
+vyučujúci	преподаватель
+dekan	декан
+študijné oddelenie	учебный отдел
+prezenčné štúdium	очное обучение
+termín	срок / дата
+poplatok	сбор (плата)
+školné	плата за обучение
+uznanie	признание
+doklad	документ
+preklad	перевод
+potvrdenie	подтверждение (справка)
+žiadosť	заявление / просьба
+formulár	бланк
+podpis	подпись
+pečiatka	печать
+číslica	цифра
+sčítať	сложить
+odčítať	вычесть
+násobiť	умножать
+deliť	делить
+súčet	сумма
+rozdiel	разность / разница
+súčin	произведение
+podiel	частное / доля
+zlomok	дробь
+desatinné číslo	десятичная дробь
+percento	процент
+rovnica	уравнение
+nerovnica	неравенство
+neznáma	неизвестная
+vyriešiť	решить
+funkcia	функция
+graf	график
+derivácia	производная
+integrál	интеграл
+matica	матрица / гайка (!)
+vektor	вектор
+uhol	угол
+priamka	прямая
+kružnica	окружность
+kruh	круг
+polomer	радиус
+priemer	диаметр / среднее (!)
+obsah	площадь / содержание
+objem	объём
+obvod	периметр
+trojuholník	треугольник
+štvorec	квадрат
+obdĺžnik	прямоугольник
+kocka	куб
+guľa	шар
+mocnina	степень
+odmocnina	корень (квадратный)
+výsledok	результат
+vzorec	формула
+dôkaz	доказательство
+približne	приблизительно
+rovná sa	равно
+sila	сила
+hmotnosť	масса
+rýchlosť	скорость
+zrýchlenie	ускорение
+energia	энергия
+výkon	мощность
+tlak	давление
+teplo	теплота
+napätie	напряжение
+prúd	ток
+odpor	сопротивление
+elektrický	электрический
+magnetický	магнитный
+pohyb	движение
+trenie	трение
+hustota	плотность
+jednotka	единица (измерения)
+meranie	измерение
+merať	измерять
+veličina	величина
+strojárstvo	машиностроение
+stroj	машина / станок
+technológia	технология
+výroba	производство
+výrobok	изделие
+materiál	материал
+oceľ	сталь
+železo	железо
+kov	металл
+hliník	алюминий
+meď	медь
+plast	пластик
+zliatina	сплав
+súčiastka	деталь
+nástroj	инструмент
+skrutka	винт
+vŕtať	сверлить
+rezať	резать
+obrábanie	обработка
+sústruh	токарный станок
+frézovanie	фрезерование
+výkres	чертёж
+náčrt	эскиз
+rozmer	размер
+presnosť	точность
+kvalita	качество
+bezpečnosť	безопасность
+kontrola	контроль
+údržba	техобслуживание
+porucha	поломка
+oprava	ремонт
+opraviť	отремонтировать
+motor	двигатель
+ložisko	подшипник
+ozubené koleso	шестерня
+hriadeľ	вал
+konštrukcia	конструкция
+montáž	сборка (монтаж)
+prevádzka	эксплуатация
+automatizácia	автоматизация
+zváranie	сварка
+zvárať	сваривать
+zvar	сварной шов
+zvarový spoj	сварное соединение
+elektróda	электрод
+oblúk	дуга
+oblúkové zváranie	дуговая сварка
+ochranný plyn	защитный газ
+zváračka	сварочный аппарат
+zváračská kukla	маска сварщика
+ochranné rukavice	защитные перчатки
+spájkovanie	пайка
+rezanie plameňom	газовая резка
+tavenie	плавление
+roztavený	расплавленный
+chladnutie	остывание
+trhlina	трещина
+pórovitosť	пористость
+prídavný materiál	присадочный материал
+základný materiál	основной металл
+hrúbka	толщина
+plech	лист металла
+rúra	труба
+kariéra	карьера
+zamestnávateľ	работодатель
+zamestnanec	работник
+pracovná zmluva	трудовой договор
+zručnosti	навыки
+schopnosť	способность
+zodpovednosť	ответственность
+povinnosť	обязанность
+projekt	проект
+porada	совещание
+úspech	успех
+neúspech	неудача
+zarábať	зарабатывать
+mzda	зарплата
+daň	налог
+nezamestnaný	безработный
+prax	практика
+stáž	стажировка
+štát	государство
+vláda	правительство
+zákon	закон
+úrad	учреждение
+úradník	чиновник
+cudzinec	иностранец
+cudzinecká polícia	полиция по делам иностранцев
+povolenie na pobyt	вид на жительство
+prechodný pobyt	временное проживание
+občan	гражданин
+občianstvo	гражданство
+doklad totožnosti	удостоверение личности
+platnosť	срок действия
+zdravotné poistenie	медицинская страховка
+poisťovňa	страховая компания
+výpis z registra trestov	справка о несудимости
+overená kópia	заверенная копия
+úradne overený	официально заверенный
+lehota	срок
+predĺžiť	продлить
+vybaviť	оформить / уладить
+podať žiadosť	подать заявление
+schváliť	одобрить
+zamietnuť	отклонить
+stránka	страница / сайт
+aplikácia	приложение
+správa	сообщение
+správy	новости
+noviny	газета
+časopis	журнал
+článok	статья
+sociálne siete	соцсети
+heslo	пароль
+prihlásiť sa	войти / записаться
+odhlásiť sa	выйти
+stiahnuť	скачать
+nahrať	загрузить / записать
+príloha	вложение / приложение
+nabíjačka	зарядка
+obrazovka	экран
+klávesnica	клавиатура
+životné prostredie	окружающая среда
+klíma	климат
+znečistenie	загрязнение
+odpad	мусор / отходы
+triediť odpad	сортировать мусор
+recyklovať	перерабатывать
+ochrana	защита
+obnoviteľný	возобновляемый
+spotreba	потребление
+šetriť	экономить / беречь
+ovzdušie	воздух (атмосфера)
+vzťah	отношения
+priateľ / priateľka	друг / подруга (парень / девушка)
+známy	знакомый
+sused	сосед
+spolubývajúci	сосед по комнате
+spolužiak	одноклассник / однокурсник
+dôvera	доверие
+pomoc	помощь
+hádka	ссора
+pochopenie	понимание
+zvyk	привычка
+kultúra	культура
+tradícia	традиция
+sviatok	праздник
+Vianoce	Рождество
+Veľká noc	Пасха
+oslava	празднование
+avšak	однако
+napriek tomu	несмотря на это
+hoci	хотя
+zatiaľ čo	в то время как
+kým	пока
+keďže	так как
+takže	так что
+okrem toho	кроме того
+navyše	более того
+na jednej strane… na druhej strane	с одной стороны… с другой стороны
+predovšetkým	прежде всего
+napokon	в конце концов
+v podstate	по сути
+inými slovami	другими словами
+čo sa týka	что касается
+vďaka	благодаря
+kvôli	из-за
+podľa	по / согласно
+namiesto	вместо
+počas	во время
+okrem	кроме
