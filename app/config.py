@@ -59,6 +59,18 @@ def _list(name: str) -> List[int]:
     return out
 
 
+def _path(name: str, default: Path) -> Path:
+    """Путь из окружения. Относительный разрешаем от корня проекта.
+
+    Иначе бот и Mini App, запущенные из разных папок, писали бы в разные базы.
+    """
+    raw = os.environ.get(name, "").strip()
+    path = Path(raw) if raw else default
+    if not path.is_absolute():
+        path = ROOT / path
+    return path
+
+
 @dataclass
 class Config:
     # --- Telegram ---
@@ -70,14 +82,8 @@ class Config:
     source_dir: Path = field(
         default_factory=lambda: Path(os.environ.get("SOURCE_DIR", r"D:\Slovakia"))
     )
-    data_dir: Path = field(
-        default_factory=lambda: Path(os.environ.get("DATA_DIR", str(ROOT / "data")))
-    )
-    db_path: Path = field(
-        default_factory=lambda: Path(
-            os.environ.get("DB_PATH", str(ROOT / "data" / "slovak.db"))
-        )
-    )
+    data_dir: Path = field(default_factory=lambda: _path("DATA_DIR", ROOT / "data"))
+    db_path: Path = field(default_factory=lambda: _path("DB_PATH", ROOT / "data" / "slovak.db"))
 
     # --- ИИ ---
     ai_provider: str = field(default_factory=lambda: os.environ.get("AI_PROVIDER", "openai").strip().lower())
@@ -137,6 +143,16 @@ class Config:
     # Сколько секунд работать в режиме polling и выйти. 0 = работать вечно.
     # Нужно для GitHub Actions: каждый запуск живёт несколько минут и выключается.
     run_seconds: int = field(default_factory=lambda: _int("RUN_SECONDS", 0))
+
+    # --- Mini App ---
+    # Базовый публичный HTTPS-адрес, где живёт приложение.
+    # Примеры: https://xxx.trycloudflare.com или https://username.pythonanywhere.com
+    webapp_base_url: str = field(
+        default_factory=lambda: os.environ.get("WEBAPP_BASE_URL", "").strip().rstrip("/")
+    )
+    # Режим разработки: разрешает заходить в приложение из обычного браузера
+    app_dev: bool = field(default_factory=lambda: _bool("APP_DEV", False))
+    dev_telegram_id: int = field(default_factory=lambda: _int("DEV_TELEGRAM_ID", 8636653095))
 
     @property
     def webhook_url(self) -> str:

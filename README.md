@@ -36,8 +36,10 @@ python tests\test_core.py     # 44 проверки ядра: контент, о
 python tests\test_flow.py     # 35 проверок сквозного сценария через aiogram
 python tests\test_webhook.py  # 9 проверок режима вебхука
 python tests\test_tts.py      # 8 проверок озвучки (синтез, кэш, голоса)
+python tests\test_miniapp.py  # 50 проверок API Mini App (в т.ч. что ответы не утекают)
 python tools\dry_run.py       # запуск без Telegram: БД, контент, планировщик
 python tools\test_voice.py    # прислать тестовое голосовое сообщение в чат
+python tools\reset_progress.py # сбросить прогресс (с бэкапом базы)
 ```
 
 ## Управление ботом
@@ -59,6 +61,20 @@ python tools\botctl.py restart
 `.env` в блокноте, если токен ещё не вписан.
 
 ---
+
+## Mini App — приложение внутри Telegram
+
+В меню бота есть кнопка **«📱 Открыть приложение»**: она открывает веб-приложение
+прямо в Telegram, где доступно всё то же — уроки, слова, прогресс, ошибки,
+мини-тест, тренировка ошибок, озвучка. Чат и приложение работают с одной базой.
+
+```bash
+python tools\miniapp_tunnel.py start    # сервер + публичный HTTPS + кнопка в боте
+python tools\miniapp_tunnel.py status
+python tools\miniapp_tunnel.py stop
+```
+
+Подробности — в [`deploy/miniapp.md`](deploy/miniapp.md).
 
 ## Команды бота
 

@@ -7,10 +7,17 @@ import logging
 from aiogram import Bot, F, Router
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import (
+    CallbackQuery,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+    WebAppInfo,
+)
 
 from app import db
-from app.keyboards import back_to, main_menu
+from app.config import CONFIG
+from app.keyboards import back_to, main_menu_with_app
 
 log = logging.getLogger("start")
 router = Router(name="start")
@@ -53,7 +60,31 @@ async def cmd_start(message: Message, bot: Bot, state: FSMContext) -> None:
         "Привет! 👋 Я твой тренажёр словацкого.\n"
         "Внутри — уроки из твоего тренажёра, слова с повторением, аудирование, письмо и разговор.\n\n"
         "Начни с урока — или выбери, что делаем сегодня.",
-        reply_markup=main_menu(),
+        reply_markup=main_menu_with_app(CONFIG.webapp_base_url),
+    )
+
+
+@router.message(Command("app", "приложение"))
+async def cmd_app(message: Message) -> None:
+    """Кнопка запуска Mini App."""
+    if not CONFIG.webapp_base_url:
+        await message.answer(
+            "Приложение ещё не подключено: нужно публичный HTTPS-адрес.\n"
+            "Почитай deploy/miniapp.md — там три варианта за 5 минут."
+        )
+        return
+    await message.answer(
+        "Открываю приложение 👇",
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="📱 Открыть",
+                        web_app=WebAppInfo(url=CONFIG.webapp_base_url),
+                    )
+                ]
+            ]
+        ),
     )
 
 
@@ -66,4 +97,6 @@ async def cmd_help(message: Message) -> None:
 async def cb_menu(cb: CallbackQuery, state: FSMContext) -> None:
     await cb.answer()
     await state.set_state(None)
-    await cb.message.edit_text("Главное меню. Что делаем?", reply_markup=main_menu())
+    await cb.message.edit_text(
+        "Главное меню. Что делаем?", reply_markup=main_menu_with_app(CONFIG.webapp_base_url)
+    )

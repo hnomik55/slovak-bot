@@ -9,7 +9,7 @@ from __future__ import annotations
 import random
 from typing import Any, Dict, List, Optional, Sequence
 
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 MAIN_MENU = [
@@ -31,6 +31,22 @@ def main_menu() -> InlineKeyboardMarkup:
     for label, action in MAIN_MENU:
         kb.button(text=label, callback_data=f"nav:{action}")
     kb.adjust(2, 2, 2, 2, 2)
+    return kb.as_markup()
+
+
+def main_menu_with_app(webapp_url: str = "") -> InlineKeyboardMarkup:
+    """Главное меню с кнопкой запуска Mini App (если приложение настроено)."""
+    kb = InlineKeyboardBuilder()
+    for label, action in MAIN_MENU:
+        kb.button(text=label, callback_data=f"nav:{action}")
+    kb.adjust(2, 2, 2, 2, 2)
+    if webapp_url:
+        kb.row(
+            InlineKeyboardButton(
+                text="📱 Открыть приложение",
+                web_app=WebAppInfo(url=webapp_url),
+            )
+        )
     return kb.as_markup()
 
 

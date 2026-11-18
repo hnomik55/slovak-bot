@@ -25,7 +25,6 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)-7s %(name)s: %(mess
 
 from aiogram.client.bot import Bot  # noqa: E402
 from aiogram.client.default import DefaultBotProperties  # noqa: E402
-from aiogram.fsm.storage.memory import MemoryStorage  # noqa: E402
 
 import bot as bot_module  # noqa: E402
 from app import content as content_mod  # noqa: E402

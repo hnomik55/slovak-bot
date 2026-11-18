@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import os
 import shutil
 import sys
@@ -29,7 +28,7 @@ os.environ["WEBHOOK_SECRET"] = "testsecret123"
 from aiogram.client.bot import Bot  # noqa: E402
 from aiogram.methods import AnswerCallbackQuery, EditMessageText, SendMessage, SendVoice  # noqa: E402
 from aiogram.methods.base import Response  # noqa: E402
-from aiogram.types import Chat, Message, Update  # noqa: E402
+from aiogram.types import Chat, Message  # noqa: E402
 
 from app import content as content_mod  # noqa: E402
 from app import db  # noqa: E402

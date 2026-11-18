@@ -34,7 +34,6 @@ from app.scoring import (
     RESULT_TYPO,
     grade_build,
     grade_choice,
-    grade_match,
     grade_text,
     infer_tag,
     missing_accents,

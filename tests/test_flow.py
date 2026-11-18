@@ -229,7 +229,11 @@ async def main() -> int:
     for keyboard in session.keyboards():
         for row in keyboard:
             for button in row:
-                if button.callback_data.startswith("tk:choice:") and button.text.strip() != "SLO-vensko":
+                if (
+                    button.callback_data
+                    and button.callback_data.startswith("tk:choice:")
+                    and button.text.strip() != "SLO-vensko"
+                ):
                     wrong = button.callback_data
     check("правильный вариант найден", right is not None)
     check("неправильный вариант найден", wrong is not None)

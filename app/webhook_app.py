@@ -19,12 +19,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Optional
+from pathlib import Path
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.types import Update
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 
 from app.config import CONFIG
 
@@ -81,6 +81,34 @@ def create_app(bot: Bot, dp: Dispatcher) -> Flask:
     @app.route("/health", methods=["GET"])
     def health():
         return jsonify({"ok": True, "mode": CONFIG.mode})
+
+    # --- Mini App ---
+    try:
+        from app.miniapp_api import bp as miniapp_bp
+
+        app.register_blueprint(miniapp_bp)
+    except Exception as exc:  # не ломаем основной бот из-за Mini App
+        log.warning("Mini App API не подключился: %s", exc)
+
+    miniapp_dir = Path(__file__).resolve().parent.parent / "miniapp"
+
+    @app.route("/", methods=["GET"])
+    def miniapp_index():
+        index = miniapp_dir / "index.html"
+        if not index.exists():
+            return jsonify({"error": "miniapp_not_built"}), 404
+        return index.read_text(encoding="utf-8")
+
+    @app.route("/app", methods=["GET"])
+    def miniapp_open():
+        return miniapp_index()
+
+    @app.route("/static/<path:filename>")
+    def miniapp_static(filename: str):
+        target = (miniapp_dir / filename).resolve()
+        if not str(target).startswith(str(miniapp_dir.resolve())) or not target.exists():
+            return jsonify({"error": "not_found"}), 404
+        return send_file(str(target))
 
     return app
 

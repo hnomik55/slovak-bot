@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Slovencina</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+  --tg-theme-bg-color: #17212b;
+  --tg-theme-text-color: #f5f5f5;
+  --tg-theme-secondary-bg-color: #232e3c;
+  --tg-theme-hint-color: #8a9ba8;
+  --tg-theme-link-color: #6ab3f3;
+  --tg-theme-button-color: #3e82ac;
+  --tg-theme-button-text-color: #ffffff;
+  --tg-theme-header-bg-color: #17212b;
+  --tg-theme-section-bg-color: #1f2a36;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.app {
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 16px 14px 28px;
+  min-height: 100vh;
+}
+h1 { font-size: 22px; margin: 8px 0 12px; }
+h2 { font-size: 18px; margin: 8px 0 10px; }
+h3 { font-size: 16px; margin: 8px 0 6px; }
+p { margin: 6px 0; line-height: 1.4; }
+.muted { color: var(--tg-theme-hint-color); font-size: 13px; }
+.card {
+  background: var(--tg-theme-section-bg-color);
+  border-radius: 14px;
+  padding: 14px;
+  margin: 10px 0;
+}
+.stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 10px 0;
+}
+.stat {
+  background: var(--tg-theme-secondary-bg-color);
+  border-radius: 12px;
+  padding: 10px;
+}
+.stat .label { font-size: 12px; color: var(--tg-theme-hint-color); }
+.stat .value { font-size: 18px; font-weight: 600; margin-top: 2px; }
+.btn {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--tg-theme-button-color);
+  color: var(--tg-theme-button-text-color);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 8px 0;
+  cursor: pointer;
+}
+.btn:active { opacity: 0.85; }
+.btn.secondary {
+  background: var(--tg-theme-secondary-bg-color);
+  color: var(--tg-theme-text-color);
+}
+.btn.danger { background: #d9534f; color: #fff; }
+.btn.ghost {
+  background: transparent;
+  border: 1px solid var(--tg-theme-secondary-bg-color);
+  color: var(--tg-theme-text-color);
+}
+.grid-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+.tile {
+  background: var(--tg-theme-secondary-bg-color);
+  border: none;
+  border-radius: 14px;
+  padding: 14px 10px;
+  color: var(--tg-theme-text-color);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+.tile:active { opacity: 0.85; }
+.progress {
+  height: 6px;
+  background: var(--tg-theme-secondary-bg-color);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.progress > div {
+  height: 100%;
+  background: var(--tg-theme-button-color);
+  transition: width .2s;
+}
+.option {
+  text-align: left;
+}
+.chip {
+  display: inline-block;
+  padding: 8px 12px;
+  margin: 4px;
+  border-radius: 10px;
+  background: var(--tg-theme-secondary-bg-color);
+  cursor: pointer;
+  user-select: none;
+}
+.chip.used { opacity: 0.35; pointer-events: none; }
+.chip-row {
+  min-height: 44px;
+  padding: 8px;
+  background: var(--tg-theme-secondary-bg-color);
+  border-radius: 12px;
+  margin: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.kb-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin: 10px 0;
+}
+.kb-key {
+  padding: 10px 0;
+  border: none;
+  border-radius: 8px;
+  background: var(--tg-theme-secondary-bg-color);
+  color: var(--tg-theme-text-color);
+  font-size: 16px;
+  cursor: pointer;
+}
+.kb-key:active { opacity: 0.7; }
+.input-field {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--tg-theme-secondary-bg-color);
+  background: var(--tg-theme-bg-color);
+  color: var(--tg-theme-text-color);
+  font-size: 16px;
+  margin: 8px 0;
+}
+.feedback.ok { border-left: 4px solid #4caf50; }
+.feedback.warn { border-left: 4px solid #ffb300; }
+.feedback.bad { border-left: 4px solid #e53935; }
+.result-label { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 80px;
+}
+.bar {
+  width: 18px;
+  background: var(--tg-theme-button-color);
+  border-radius: 4px 4px 0 0;
+  min-height: 2px;
+}
+.bar-wrap {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  justify-content: center;
+  margin: 10px 0;
+}
+.unit-bar {
+  height: 8px;
+  background: var(--tg-theme-secondary-bg-color);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 4px 0 8px;
+}
+.unit-bar > div { height: 100%; background: var(--tg-theme-button-color); }
+.center { text-align: center; padding: 40px 10px; }
+.list-item {
+  background: var(--tg-theme-secondary-bg-color);
+  border-radius: 10px;
+  padding: 10px;
+  margin: 6px 0;
+  font-size: 14px;
+}
+.tag-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--tg-theme-secondary-bg-color);
+}
+.mistake { font-size: 14px; margin: 4px 0; }
+table.rule-table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+table.rule-table td { padding: 6px 4px; border-bottom: 1px solid var(--tg-theme-secondary-bg-color); font-size: 14px; }
+table.rule-table td:first-child { color: var(--tg-theme-hint-color); }
+.letters { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; }
+.letter-btn { padding: 8px 10px; border-radius: 8px; border: none; background: var(--tg-theme-secondary-bg-color); color: var(--tg-theme-text-color); font-size: 16px; cursor: pointer; }
+.tabs { display: flex; gap: 8px; margin: 8px 0; }
+.tab { flex: 1; padding: 10px; border: none; border-radius: 10px; background: var(--tg-theme-secondary-bg-color); color: var(--tg-theme-text-color); cursor: pointer; }
+.tab.active { background: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); }
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+<script>
+const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+const app = document.getElementById('app');
+
+function applyTheme() {
+  if (!tg) return;
+  const tp = tg.themeParams || {};
+  const m = {
+    bg_color: '--tg-theme-bg-color',
+    text_color: '--tg-theme-text-color',
+    secondary_bg_color: '--tg-theme-secondary-bg-color',
+    hint_color: '--tg-theme-hint-color',
+    link_color: '--tg-theme-link-color',
+    button_color: '--tg-theme-button-color',
+    button_text_color: '--tg-theme-button-text-color',
+    header_bg_color: '--tg-theme-header-bg-color',
+    section_bg_color: '--tg-theme-section-bg-color'
+  };
+  for (const k in m) {
+    if (tp[k]) document.documentElement.style.setProperty(m[k], tp[k]);
+  }
+}
+applyTheme();
+if (tg) {
+  try { tg.ready(); tg.expand(); tg.setHeaderColor('bg_color'); } catch (e) {}
+}
+
+let backHandler = null;
+function setBack(cb) {
+  if (!tg) return;
+  if (backHandler) {
+    try { tg.BackButton.offClick(backHandler); } catch (e) {}
+  }
+  backHandler = cb;
+  if (cb) {
+    try { tg.BackButton.show(); tg.BackButton.onClick(cb); } catch (e) {}
+  } else {
+    try { tg.BackButton.hide(); } catch (e) {}
+  }
+}
+function haptic() { try { if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light'); } catch (e) {} }
+function showAlert(msg) {
+  try { if (tg && tg.showAlert) { tg.showAlert(msg); return; } } catch (e) {}
+  alert(msg);
+}
+
+const cache = { home: null, units: null };
+let user = { first_name: 'Ученик' };
+let runner = null;
+let currentBuild = [];
+let typeBuffer = '';
+let vocabQueue = [];
+let vocabIndex = 0;
+let vocabMode = 'due';
+let noConnRetry = null;
+
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+async function apiFetch(path, opts) {
+  opts = opts || {};
+  const headers = { 'X-Telegram-Init-Data': (tg && tg.initData) || '' };
+  if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
+  const res = await fetch(path, {
+    method: opts.method || 'GET',
+    body: opts.body,
+    headers: Object.assign(headers, opts.headers || {})
+  });
+  if (!res.ok) {
+    let err = 'http_' + res.status;
+    try { const j = await res.json(); if (j && j.error) err = j.error; } catch (e) {}
+    throw new Error(err);
+  }
+  const ct = res.headers.get('content-type') || '';
+  if (ct.includes('application/json')) return res.json();
+  return res;
+}
+
+function showNoConn(retry) {
+  noConnRetry = retry;
+  app.innerHTML = `
+    <div class="center">
+      <h2>Нет связи с ботом</h2>
+      <p class="muted">Проверьте соединение и попробуйте снова.</p>
+      <button class="btn" id="retryBtn">Повторить</button>
+    </div>`;
+  const b = document.getElementById('retryBtn');
+  if (b) b.onclick = function () { haptic(); if (noConnRetry) noConnRetry(); };
+  setBack(null);
+}
+
+async function loadHome(force) {
+  if (!force && cache.home) return cache.home;
+  try {
+    const [session, home] = await Promise.all([apiFetch('/api/session'), apiFetch('/api/home')]);
+    if (session && session.user) user.first_name = session.user.first_name || user.first_name;
+    cache.home = home;
+    return home;
+  } catch (e) {
+    if (cache.home) return cache.home;
+    throw e;
+  }
+}
+async function loadUnits(force) {
+  if (!force && cache.units) return cache.units;
+  try {
+    const u = await apiFetch('/api/units');
+    cache.units = u;
+    return u;
+  } catch (e) {
+    if (cache.units) return cache.units;
+    throw e;
+  }
+}
+
+async function screenHome() {
+  try {
+    const home = await loadHome();
+    app.innerHTML = `
+      <h1>Привет, ${esc(user.first_name)}!</h1>
+      <div class="stat-row">
+        <div class="stat"><div class="label">Уровень</div><div class="value">${esc(home.level)}</div></div>
+        <div class="stat"><div class="label">XP</div><div class="value">${esc(home.xp)}</div></div>
+        <div class="stat"><div class="label">Серия дней</div><div class="value">${esc(home.streak)}</div></div>
+        <div class="stat"><div class="label">На повторение</div><div class="value">${esc(home.words_due)}</div></div>
+      </div>
+      <div class="grid-btns">
+        <button class="tile" id="bLessons">📚 Уроки</button>
+        <button class="tile" id="bWords">🔤 Слова</button>
+        <button class="tile" id="bProgress">📊 Прогресс</button>
+        <button class="tile" id="bErrors">⚠️ Мои ошибки</button>
+        <button class="tile" id="bQuiz">📝 Мини-тест</button>
+        <button class="tile" id="bDrill">🎯 Тренировать ошибки</button>
+      </div>`;
+    document.getElementById('bLessons').onclick = function () { haptic(); screenUnits(); };
+    document.getElementById('bWords').onclick = function () { haptic(); screenVocab('due'); };
+    document.getElementById('bProgress').onclick = function () { haptic(); screenProgress(); };
+    document.getElementById('bErrors').onclick = function () { haptic(); screenErrors(); };
+    document.getElementById('bQuiz').onclick = function () { haptic(); doQuiz(); };
+    document.getElementById('bDrill').onclick = function () { haptic(); doDrill(); };
+    setBack(null);
+  } catch (e) {
+    showNoConn(function () { screenHome(); });
+  }
+}
+
+async function screenUnits() {
+  try {
+    const data = await loadUnits();
+    const units = data.units || [];
+    let html = `<h1>Карта уроков</h1>`;
+    units.forEach(function (u) {
+      html += `<div class="card"><h2>${esc(u.n)}. ${esc(u.title)}</h2>`;
+      if (u.desc) html += `<p class="muted">${esc(u.desc)}</p>`;
+      (u.lessons || []).forEach(function (l) {
+        let icon = '▶️';
+        if (l.done) icon = '✅';
+        else if (l.locked) icon = '🔒';
+        html += `<button class="btn ${l.locked ? 'secondary' : ''}" data-lesson="${esc(l.id)}" ${l.locked ? 'disabled' : ''} style="text-align:left;">
+          ${icon} ${esc(l.id)}. ${esc(l.title)} <span class="muted">(${esc(l.tasks)} зад.)</span>
+          ${l.sub ? '<div class="muted">' + esc(l.sub) + '</div>' : ''}
+        </button>`;
+      });
+      html += `</div>`;
+    });
+    app.innerHTML = html;
+    app.querySelectorAll('[data-lesson]').forEach(function (b) {
+      b.onclick = function () {
+        haptic();
+        openLesson(b.getAttribute('data-lesson'));
+      };
+    });
+    setBack(function () { screenHome(); });
+  } catch (e) {
+    showNoConn(function () { screenUnits(); });
+  }
+}
+
+async function openLesson(id) {
+  try {
+    const lesson = await apiFetch('/api/lesson/' + encodeURIComponent(id));
+    screenLesson(lesson);
+  } catch (e) {
+    showNoConn(function () { openLesson(id); });
+  }
+}
+
+function screenLesson(lesson) {
+  let html = `<h1>${esc(lesson.title)}</h1>`;
+  if (lesson.sub) html += `<p class="muted">${esc(lesson.sub)}</p>`;
+  const rule = lesson.rule || {};
+  if (rule.title) html += `<h2>${esc(rule.title)}</h2>`;
+  (rule.p || []).forEach(function (para) {
+    html += `<p>${esc(para)}</p>`;
+  });
+  if (rule.rows && rule.rows.length) {
+    html += `<table class="rule-table">`;
+    rule.rows.forEach(function (r) {
+      html += `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`;
+    });
+    html += `</table>`;
+  }
+  (rule.ex || []).forEach(function (ex) {
+    html += `<p class="muted">• ${esc(ex)}</p>`;
+  });
+  html += `<button class="btn" id="startBtn">Начать</button>`;
+  app.innerHTML = html;
+  document.getElementById('startBtn').onclick = function () {
+    haptic();
+    startRunner(lesson, 'lesson');
+  };
+  setBack(function () { screenUnits(); });
+}
+
+function startRunner(src, kind) {
+  runner = {
+    title: src.title || 'Урок',
+    tasks: src.tasks || [],
+    idx: 0,
+    correct: 0,
+    total: 0,
+    mistakes: [],
+    lessonId: src.id || (kind === 'quiz' ? 'test' : 'drill'),
+    kind: kind,
+    match: null,
+    matchTaskIdx: -1
+  };
+  screenRunner();
+}
+
+function screenRunner() {
+  if (!runner) { screenHome(); return; }
+  if (runner.idx >= runner.tasks.length) {
+    finishRunner();
+    return;
+  }
+  const task = runner.tasks[runner.idx];
+  const pct = Math.round((runner.idx / runner.tasks.length) * 100);
+  let html = `
+    <div class="muted">${esc(runner.title)} — задание ${runner.idx + 1} из ${runner.tasks.length}</div>
+    <div class="progress"><div style="width:${pct}%"></div></div>
+  `;
+  if (task.kind === 'choice') {
+    html += renderChoice(task);
+  } else if (task.kind === 'type') {
+    html += renderType(task);
+  } else if (task.kind === 'build') {
+    html += renderBuild(task);
+  } else if (task.kind === 'match') {
+    html += renderMatch(task);
+  }
+  app.innerHTML = html;
+  attachTaskHandlers(task);
+  setBack(function () { screenHome(); });
+}
+
+function renderChoice(task) {
+  let html = `<div class="card"><div class="prompt">${esc(task.prompt)}</div></div>`;
+  (task.options || []).forEach(function (opt, i) {
+    html += `<button class="btn option" data-choice="${i}">${esc(opt)}</button>`;
+  });
+  return html;
+}
+
+let SK_LETTERS = 'á ä č ď é í ĺ ľ ň ó ô ŕ š ť ú ý ž'.split(' ');
+
+function renderType(task) {
+  typeBuffer = '';
+  let html = `<div class="card"><div class="prompt">${esc(task.prompt)}</div>`;
+  html += `<div class="muted" style="margin:6px 0;">${esc(task.sk)}</div>`;
+  html += `<input class="input-field" id="typeInput" type="text" value="" autocomplete="off" />`;
+  html += `</div>`;
+  html += `<div class="kb-grid">`;
+  SK_LETTERS.forEach(function (ch) {
+    html += `<button class="kb-key" data-letter="${esc(ch)}">${esc(ch)}</button>`;
+  });
+  html += `<button class="kb-key" data-letter=" ">␣</button>`;
+  html += `<button class="kb-key" data-letter="__back__">⌫</button>`;
+  html += `</div>`;
+  html += `<button class="btn" id="typeCheck">✅ Проверить</button>`;
+  html += `<button class="btn secondary" id="typeClear">↩️ Очистить</button>`;
+  return html;
+}
+
+function renderBuild(task) {
+  currentBuild = [];
+  let html = `<div class="card"><div class="prompt">${esc(task.prompt)}</div></div>`;
+  html += `<div class="chip-row" id="buildRow"></div>`;
+  html += `<div class="letters" id="buildBank">`;
+  (task.words || []).forEach(function (w, i) {
+    html += `<span class="chip" data-build="${i}">${esc(w)}</span>`;
+  });
+  html += `</div>`;
+  html += `<button class="btn" id="buildCheck">✅ Проверить</button>`;
+  html += `<button class="btn secondary" id="buildClear">↩️ Очистить</button>`;
+  return html;
+}
+
+function renderMatch(task) {
+  if (!runner.match || runner.matchTaskIdx !== runner.idx) {
+    runner.match = { pairs: task.pairs || [], current: 0, chosen: {}, answered: false };
+    runner.matchTaskIdx = runner.idx;
+  }
+  return matchHTML(task);
+}
+
+function matchHTML(task) {
+  const m = runner.match;
+  if (m.current >= m.pairs.length) {
+    return `<div class="card"><div class="prompt">${esc(task.prompt)}</div><p>Проверяем…</p></div>`;
+  }
+  const pair = m.pairs[m.current];
+  const left = pair[0];
+  const rights = m.pairs.map(function (p) { return p[1]; });
+  const opts = rights.slice().sort(function () { return Math.random() - 0.5; });
+  let html = `<div class="card"><div class="prompt">${esc(task.prompt)}</div>`;
+  html += `<p>Пара ${m.current + 1} из ${m.pairs.length}</p>`;
+  html += `<p><b>Что значит «${esc(left)}»?</b></p></div>`;
+  opts.forEach(function (opt) {
+    html += `<button class="btn option" data-matchopt="${esc(opt)}" data-matchleft="${esc(left)}">${esc(opt)}</button>`;
+  });
+  html += `<div id="matchFeedback" style="margin-top:10px;"></div>`;
+  return html;
+}
+
+function attachTaskHandlers(task) {
+  if (task.kind === 'choice') {
+    app.querySelectorAll('[data-choice]').forEach(function (b) {
+      b.onclick = function () {
+        haptic();
+        const idx = parseInt(b.getAttribute('data-choice'), 10);
+        submitAnswer(task, { kind: 'choice', value: idx });
+      };
+    });
+  } else if (task.kind === 'type') {
+    const input = document.getElementById('typeInput');
+    if (input) {
+      input.addEventListener('input', function () { typeBuffer = input.value; });
+      input.value = typeBuffer;
+    }
+    app.querySelectorAll('[data-letter]').forEach(function (b) {
+      b.onclick = function () {
+        haptic();
+        const ch = b.getAttribute('data-letter');
+        if (ch === '__back__') {
+          typeBuffer = typeBuffer.slice(0, -1);
+        } else {
+          typeBuffer += ch;
+        }
+        const inp = document.getElementById('typeInput');
+        if (inp) inp.value = typeBuffer;
+      };
+    });
+    const check = document.getElementById('typeCheck');
+    if (check) check.onclick = function () {
+      haptic();
+      const inp = document.getElementById('typeInput');
+      if (inp) typeBuffer = inp.value;
+      submitAnswer(task, { kind: 'type', value: typeBuffer });
+    };
+    const clear = document.getElementById('typeClear');
+    if (clear) clear.onclick = function () {
+      haptic();
+      typeBuffer = '';
+      const inp = document.getElementById('typeInput');
+      if (inp) inp.value = '';
+    };
+  } else if (task.kind === 'build') {
+    app.querySelectorAll('[data-build]').forEach(function (b) {
+      b.onclick = function () {
+        haptic();
+        const i = parseInt(b.getAttribute('data-build'), 10);
+        const w = (task.words || [])[i];
+        if (w == null) return;
+        if (currentBuild.indexOf(i) !== -1) return;
+        currentBuild.push(i);
+        b.classList.add('used');
+        renderBuildRow(task);
+      };
+    });
+    const check = document.getElementById('buildCheck');
+    if (check) check.onclick = function () {
+      haptic();
+      const words = currentBuild.map(function (i) { return (task.words || [])[i]; });
+      submitAnswer(task, { kind: 'build', value: words });
+    };
+    const clear = document.getElementById('buildClear');
+    if (clear) clear.onclick = function () {
+      haptic();
+      currentBuild = [];
+      app.querySelectorAll('[data-build]').forEach(function (b) { b.classList.remove('used'); });
+      renderBuildRow(task);
+    };
+    renderBuildRow(task);
+  } else if (task.kind === 'match') {
+    runner.match = runner.match || { pairs: task.pairs || [], current: 0, chosen: {}, answered: false };
+    attachMatchHandlers(task);
+  }
+}
+
+function renderBuildRow(task) {
+  const row = document.getElementById('buildRow');
+  if (!row) return;
+  row.innerHTML = currentBuild.map(function (i) {
+    return `<span class="chip">${esc((task.words || [])[i])}</span>`;
+  }).join('') || '<span class="muted">Нажимайте слова ниже</span>';
+}
+
+function attachMatchHandlers(task) {
+  app.querySelectorAll('[data-matchopt]').forEach(function (b) {
+    b.onclick = function () {
+      haptic();
+      const opt = b.getAttribute('data-matchopt');
+      const left = b.getAttribute('data-matchleft');
+      const m = runner.match;
+      const pair = m.pairs[m.current];
+      const right = pair[1];
+      const ok = (opt === right);
+      m.chosen[left] = opt;
+      // disable options
+      app.querySelectorAll('[data-matchopt]').forEach(function (x) { x.disabled = true; });
+      b.style.background = ok ? '#4caf50' : '#e53935';
+      const fb = document.getElementById('matchFeedback');
+      if (fb) {
+        fb.innerHTML = ok
+          ? `<p style="color:#4caf50;font-weight:600;">Верно</p>`
+          : `<p style="color:#e53935;font-weight:600;">Неверно. Правильно: ${esc(right)}</p>`
+          + `<button class="btn" id="matchNext">➡️ Дальше</button>`;
+        const nb = document.getElementById('matchNext');
+        if (nb) nb.onclick = function () {
+          haptic();
+          m.current += 1;
+          if (m.current >= m.pairs.length) {
+            submitMatch(task);
+          } else {
+            const area = document.getElementById('app');
+            // re-render match task
+            screenRunner();
+          }
+        };
+      }
+    };
+  });
+}
+
+async function submitMatch(task) {
+  const mapping = runner.match.chosen;
+  await submitAnswer(task, { kind: 'match', value: mapping });
+}
+
+async function submitAnswer(task, answerValue) {
+  try {
+    const res = await apiFetch('/api/answer', {
+      method: 'POST',
+      body: JSON.stringify({ lesson_id: runner.lessonId, task_i: runner.idx, answer: answerValue })
+    });
+    showFeedback(task, res);
+  } catch (e) {
+    if (e.message === 'stale') {
+      showAlert('Задание уже проверено. Нажмите «Дальше».');
+    } else {
+      showNoConn(function () { submitAnswer(task, answerValue); });
+    }
+  }
+}
+
+function showFeedback(task, res) {
+  const cls = res.result === 'ok' ? 'ok' : (res.result === 'typo' || res.result === 'accents' ? 'warn' : 'bad');
+  let html = `<div class="card feedback ${cls}">
+    <div class="result-label">${esc(res.result_ru)}</div>
+    <div>Ваш ответ: <code>${esc(res.given)}</code></div>
+    <div>Правильно: <b>${esc(res.expected)}</b></div>`;
+  if (res.explanation) html += `<div class="muted" style="margin-top:6px;">${esc(res.explanation)}</div>`;
+  if (res.result === 'accents' && res.missing_accents && res.missing_accents.length) {
+    html += `<div style="margin-top:6px;">Потерянные диакритики: <b>${res.missing_accents.map(esc).join(' ')}</b></div>`;
+  }
+  html += `
+    <button class="btn ghost" id="speakBtn" style="margin-top:8px;">🔊 Озвучить</button>
+    <button class="btn" id="nextBtn">➡️ Дальше</button>
+    <button class="btn secondary" id="retryBtn">🔁 Ещё раз</button>
+  </div>`;
+  app.innerHTML = html;
+  const speakBtn = document.getElementById('speakBtn');
+  if (speakBtn) speakBtn.onclick = function () { haptic(); playSpeech(res.expected || res.given); };
+  const nextBtn = document.getElementById('nextBtn');
+  if (nextBtn) nextBtn.onclick = function () {
+    haptic();
+    runner.idx += 1;
+    if (runner.idx >= runner.tasks.length) finishRunner();
+    else screenRunner();
+  };
+  const retryBtn = document.getElementById('retryBtn');
+  if (retryBtn) retryBtn.onclick = function () {
+    haptic();
+    // повторить текущее задание
+    screenRunner();
+  };
+}
+
+async function playSpeech(text) {
+  if (!text) return;
+  try {
+    const res = await fetch('/api/speech?text=' + encodeURIComponent(text), {
+      headers: { 'X-Telegram-Init-Data': (tg && tg.initData) || '' }
+    });
+    if (!res.ok) throw new Error('no_tts');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.play();
+  } catch (e) {
+    showAlert('Озвучка недоступна');
+  }
+}
+
+async function finishRunner() {
+  const lessonId = runner.lessonId || 'drill';
+  try {
+    const res = await apiFetch('/api/lesson/' + encodeURIComponent(lessonId) + '/finish', { method: 'POST' });
+    cache.home = null;
+    cache.units = null;
+    let html = `<h1>Итог</h1>`;
+    html += `<div class="card"><div class="result-label">${esc(res.percent)}%</div>`;
+    html += `<p>Верно: ${esc(res.correct)} из ${esc(res.total)}</p>`;
+    if (res.xp) html += `<p>XP: +${esc(res.xp)}</p>`;
+    html += `<p>Серия: ${esc(res.streak)} дней</p></div>`;
+    if (res.mistakes && res.mistakes.length) {
+      html += `<div class="card"><h3>Ошибки</h3>`;
+      res.mistakes.forEach(function (m) {
+        html += `<div class="mistake">❌ ${esc(m.given)} → ✅ ${esc(m.expected)} <span class="muted">(${esc(m.tag)})</span></div>`;
+      });
+      html += `</div>`;
+    }
+    if (res.next_lesson) {
+      html += `<button class="btn" id="nextLessonBtn">Следующий урок</button>`;
+    }
+    html += `<button class="btn secondary" id="homeBtn">На главную</button>`;
+    app.innerHTML = html;
+    const nl = document.getElementById('nextLessonBtn');
+    if (nl) nl.onclick = async function () {
+      haptic();
+      try {
+        const lesson = await apiFetch('/api/lesson/' + encodeURIComponent(res.next_lesson.id));
+        screenLesson(lesson);
+      } catch (e) { showNoConn(function () { }); }
+    };
+    const hb = document.getElementById('homeBtn');
+    if (hb) hb.onclick = function () { haptic(); screenHome(); };
+    setBack(function () { screenHome(); });
+  } catch (e) {
+    showNoConn(function () { finishRunner(); });
+  }
+}
+
+async function screenVocab(mode) {
+  vocabMode = mode || vocabMode;
+  try {
+    const path = vocabMode === 'due' ? '/api/vocab/due?count=20' : '/api/vocab/new?count=10';
+    const data = await apiFetch(path);
+    vocabQueue = data.cards || [];
+    vocabIndex = 0;
+    renderVocabTabs();
+    if (vocabQueue.length === 0) {
+      // Важно: не app.innerHTML += ... — это пересоздаёт кнопки вкладок
+      // и стирает их обработчики. Пишем внутрь контейнера.
+      const area = document.getElementById('vocabArea');
+      if (area) area.innerHTML = `<div class="center"><p class="muted">Карточек нет.</p></div>`;
+      return;
+    }
+    renderVocabCard();
+  } catch (e) {
+    showNoConn(function () { screenVocab(vocabMode); });
+  }
+}
+
+function renderVocabTabs() {
+  app.innerHTML = `
+    <h1>Слова</h1>
+    <div class="tabs">
+      <button class="tab ${vocabMode === 'due' ? 'active' : ''}" id="tabDue">На повторение</button>
+      <button class="tab ${vocabMode === 'new' ? 'active' : ''}" id="tabNew">Новые</button>
+    </div>
+    <div id="vocabArea"></div>`;
+  document.getElementById('tabDue').onclick = function () { haptic(); screenVocab('due'); };
+  document.getElementById('tabNew').onclick = function () { haptic(); screenVocab('new'); };
+}
+
+function renderVocabCard() {
+  const area = document.getElementById('vocabArea');
+  if (!area) return;
+  const card = vocabQueue[vocabIndex];
+  if (!card) {
+    area.innerHTML = `<div class="center"><p>Готово! 🎉</p><button class="btn" id="vocabHome">На главную</button></div>`;
+    const b = document.getElementById('vocabHome');
+    if (b) b.onclick = function () { screenHome(); };
+    return;
+  }
+  area.innerHTML = `
+    <div class="card">
+      <div style="font-size:24px;font-weight:700;margin-bottom:8px;">${esc(card.sk)}</div>
+      <button class="btn ghost" id="vocabSpeak" style="width:auto;display:inline-block;">🔊</button>
+      <div id="vocabTrans" style="display:none;margin:8px 0;font-size:18px;">${esc(card.ru)}</div>
+      <button class="btn secondary" id="vocabShow">👁 Показать перевод</button>
+      <div id="vocabRating" style="display:none;margin-top:10px;">
+        <button class="btn danger" data-q="0">😵 Не знаю</button>
+        <button class="btn secondary" data-q="1">🤔 С трудом</button>
+        <button class="btn secondary" data-q="2">🙂 Нормально</button>
+        <button class="btn" data-q="3">😃 Легко</button>
+      </div>
+    </div>
+    <div class="muted">Карточка ${vocabIndex + 1} из ${vocabQueue.length}</div>`;
+  const speak = document.getElementById('vocabSpeak');
+  if (speak) speak.onclick = function () { haptic(); playSpeech(card.sk); };
+  const show = document.getElementById('vocabShow');
+  if (show) show.onclick = function () {
+    haptic();
+    const t = document.getElementById('vocabTrans');
+    if (t) t.style.display = 'block';
+    const r = document.getElementById('vocabRating');
+    if (r) r.style.display = 'block';
+    show.style.display = 'none';
+  };
+  area.querySelectorAll('[data-q]').forEach(function (b) {
+    b.onclick = async function () {
+      haptic();
+      const q = parseInt(b.getAttribute('data-q'), 10);
+      try {
+        const res = await apiFetch('/api/vocab/rate', {
+          method: 'POST',
+          body: JSON.stringify({ vocab_id: card.id, quality: q })
+        });
+        cache.home = null;
+        vocabIndex += 1;
+        renderVocabCard();
+      } catch (e) {
+        showNoConn(function () { screenVocab(vocabMode); });
+      }
+    };
+  });
+  setBack(function () { screenHome(); });
+}
+
+async function screenProgress() {
+  try {
+    const p = await apiFetch('/api/progress');
+    const maxDay = Math.max.apply(null, (p.days || []).map(function (d) { return d.xp || 0; }).concat([1]));
+    let html = `<h1>Прогресс</h1>`;
+    html += `<div class="stat-row">
+      <div class="stat"><div class="label">XP</div><div class="value">${esc(p.xp)}</div></div>
+      <div class="stat"><div class="label">Серия</div><div class="value">${esc(p.streak)}</div></div>
+      <div class="stat"><div class="label">Рекорд</div><div class="value">${esc(p.best_streak)}</div></div>
+      <div class="stat"><div class="label">Точность</div><div class="value">${esc(p.accuracy)}%</div></div>
+    </div>`;
+    html += `<div class="card">
+      <p>Уроки: ${esc(p.lessons_done)} / ${esc(p.lessons_total)}</p>
+      <p>Задания: ${esc(p.tasks_done)}</p>
+      <p>Слова выучено: ${esc(p.words_learned)} · на повторение: ${esc(p.words_due)}</p>
+    </div>`;
+    html += `<div class="card"><h3>Последние 7 дней</h3><div class="bar-wrap">`;
+    (p.days || []).forEach(function (d) {
+      const h = Math.round(((d.xp || 0) / maxDay) * 70) + 2;
+      html += `<div class="bar-col"><div class="bar" style="height:${h}px"></div><div class="muted" style="font-size:10px;">${esc((d.day || '').slice(5))}</div></div>`;
+    });
+    html += `</div></div>`;
+    html += `<div class="card"><h3>По юнитам</h3>`;
+    (p.units || []).forEach(function (u) {
+      const pct = u.total ? Math.round((u.done / u.total) * 100) : 0;
+      html += `<p style="margin:4px 0;">${esc(u.n)}. ${esc(u.title)} — ${esc(u.done)}/${esc(u.total)}</p>`;
+      html += `<div class="unit-bar"><div style="width:${pct}%"></div></div>`;
+    });
+    html += `</div>`;
+    if (p.errors && p.errors.length) {
+      html += `<div class="card"><h3>Ошибки по тегам</h3>`;
+      p.errors.forEach(function (e) {
+        html += `<div class="tag-row"><span>${esc(e.title_ru)}</span><span class="muted">${esc(e.count)}</span></div>`;
+      });
+      html += `</div>`;
+    }
+    app.innerHTML = html;
+    setBack(function () { screenHome(); });
+  } catch (e) {
+    showNoConn(function () { screenProgress(); });
+  }
+}
+
+async function screenErrors() {
+  try {
+    const d = await apiFetch('/api/errors');
+    let html = `<h1>Мои ошибки</h1>`;
+    if (d.tags && d.tags.length) {
+      html += `<div class="card"><h3>Теги</h3>`;
+      d.tags.forEach(function (t) {
+        html += `<div class="tag-row"><span>${esc(t.title_ru)}</span><span class="muted">${esc(t.count)}</span></div>`;
+      });
+      html += `</div>`;
+    } else {
+      html += `<p class="muted">Ошибок пока нет.</p>`;
+    }
+    if (d.recent && d.recent.length) {
+      html += `<div class="card"><h3>Последние</h3>`;
+      d.recent.forEach(function (r) {
+        html += `<div class="list-item">${esc(r.given)} → <b>${esc(r.expected)}</b> <span class="muted">(${esc(r.title_ru)})</span></div>`;
+      });
+      html += `</div>`;
+    }
+    html += `<button class="btn" id="drillBtn">🎯 Тренировать ошибки</button>`;
+    html += `<button class="btn secondary" id="homeBtn">На главную</button>`;
+    app.innerHTML = html;
+    document.getElementById('drillBtn').onclick = function () { haptic(); doDrill(); };
+    document.getElementById('homeBtn').onclick = function () { haptic(); screenHome(); };
+    setBack(function () { screenHome(); });
+  } catch (e) {
+    showNoConn(function () { screenErrors(); });
+  }
+}
+
+async function doDrill() {
+  try {
+    const d = await apiFetch('/api/drill', { method: 'POST' });
+    startRunner({ title: d.title, tasks: d.tasks, id: d.id || 'drill' }, 'drill');
+  } catch (e) {
+    if (e.message === 'no_mistakes') showAlert('Нет ошибок для тренировки.');
+    else showNoConn(function () { doDrill(); });
+  }
+}
+
+async function doQuiz() {
+  try {
+    const d = await apiFetch('/api/quiz', { method: 'POST' });
+    startRunner({ title: d.title, tasks: d.tasks, id: 'test' }, 'quiz');
+  } catch (e) {
+    showNoConn(function () { doQuiz(); });
+  }
+}
+
+// init
+screenHome();
+</script>
+
+<!--
+Используемые эндпоинты:
+GET /api/session
+GET /api/home
+GET /api/units
+GET /api/lesson/<lesson_id>
+POST /api/answer
+POST /api/lesson/<lesson_id>/finish
+GET /api/vocab/due
+GET /api/vocab/new
+POST /api/vocab/rate
+GET /api/progress
+GET /api/errors
+POST /api/drill
+POST /api/quiz
+GET /api/speech?text=...
+-->
+</body>
+</html>

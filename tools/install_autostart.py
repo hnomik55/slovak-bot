@@ -36,12 +36,16 @@ def _cmd(action: str) -> str:
 
 
 def _write_runner() -> None:
-    """Готовим .cmd без кавычек-ловушек — его и кладём в автозагрузку."""
+    """Готовим .cmd без кавычек-ловушек — его и кладём в автозагрузку.
+
+    Поднимаем и бота, и Mini App с публичным адресом (Cloudflare Tunnel).
+    """
     content = (
         "@echo off\r\n"
         "cd /d \"%s\"\r\n"
         "\"%s\" \"%s\\tools\\botctl.py\" start\r\n"
-        % (ROOT, _python(), ROOT)
+        "\"%s\" \"%s\\tools\\miniapp_tunnel.py\" start\r\n"
+        % (ROOT, _python(), ROOT, _python(), ROOT)
     )
     with open(RUNNER, "w", encoding="ascii", newline="") as fh:
         fh.write(content)
