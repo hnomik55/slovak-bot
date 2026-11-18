@@ -164,6 +164,14 @@ async def main() -> int:
     bot = Bot(token=token, default=DefaultBotProperties(parse_mode="HTML"))
     dp = build_dispatcher()
 
+    if CONFIG.bot_mode == "cloud":
+        # Чат-бот живёт в GitHub Actions. Локально поднимается только Mini App,
+        # иначе два экземпляра будут драться за один токен.
+        log.info(
+            "режим cloud: чат-бот работает в GitHub Actions, локальный запуск отменён"
+        )
+        return 0
+
     if CONFIG.mode == "webhook":
         await run_webhook(bot, dp)
     else:

@@ -12,7 +12,7 @@ name: slovak bot
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/3 * * * *"
   workflow_dispatch:
   push:
     branches: [main]
@@ -31,7 +31,7 @@ permissions:
 jobs:
   bot:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 9
     steps:
       - uses: actions/checkout@v4
 
@@ -47,7 +47,7 @@ jobs:
       - name: Show content stats
         run: python -c "import json;d=json.load(open('data/content.json'));m=d['meta'];print('уроков',m['lessons'],'заданий',m['tasks'],'слов',m['vocab'])"
 
-      - name: Run bot (5 minutes)
+      - name: Run bot (3.5 minutes)
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           ADMIN_IDS: ${{ secrets.ADMIN_IDS }}
@@ -56,7 +56,7 @@ jobs:
           AI_API_KEY: ${{ secrets.AI_API_KEY }}
           AI_MODEL: ${{ vars.AI_MODEL }}
           MODE: polling
-          RUN_SECONDS: 240
+          RUN_SECONDS: 200
           DB_PATH: state/slovak.db
           TTS_ENABLED: "1"
           STT_ENABLED: "0"
@@ -83,4 +83,5 @@ jobs:
           git config user.email "bot@users.noreply.github.com"
           git add -A state || true
           git commit -m "state: прогресс ученика" || echo "изменений нет"
+          git pull --rebase origin main || true
           git push || echo "не удалось запушить (возможен конфликт)"

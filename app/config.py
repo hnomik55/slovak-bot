@@ -145,6 +145,10 @@ class Config:
     # webhook — Telegram сам шлёт апдейты на твой URL (подходит для бесплатных
     #           веб-хостингов: PythonAnywhere, Render, Railway, Fly.io)
     mode: str = field(default_factory=lambda: os.environ.get("MODE", "polling").strip().lower())
+    # Где живёт бот в чате: local — на этом ПК, cloud — в GitHub Actions.
+    # В режиме cloud автозапуск на ПК поднимает только Mini App, а чат-бот
+    # работает в облаке (чтобы два экземпляра не дрались за один токен).
+    bot_mode: str = field(default_factory=lambda: os.environ.get("BOT_MODE", "local").strip().lower())
     webhook_base_url: str = field(
         default_factory=lambda: os.environ.get("WEBHOOK_BASE_URL", "").strip().rstrip("/")
     )
