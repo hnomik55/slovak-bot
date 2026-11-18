@@ -85,9 +85,9 @@
 Итого: 40 ok, 0 fail
 
 #### test_webhook
-2026-11-18 21:04:50,696 INFO    aiogram.event: Update id=1 is handled. Duration 102 ms by bot id=123456789
-2026-11-18 21:04:50,697 WARNING webhook: запрос с неверным секретом — отклонён
-2026-11-18 21:04:50,717 INFO    aiogram.event: Update id=2 is handled. Duration 20 ms by bot id=123456789
+2026-11-18 21:09:13,734 INFO    aiogram.event: Update id=1 is handled. Duration 6 ms by bot id=123456789
+2026-11-18 21:09:13,735 WARNING webhook: запрос с неверным секретом — отклонён
+2026-11-18 21:09:13,757 INFO    aiogram.event: Update id=2 is handled. Duration 21 ms by bot id=123456789
 
 == Вебхук принимает апдейт ==
   ok   ответ 200
@@ -131,32 +131,46 @@
 Итого: 8 ok, 0 fail
 
 #### test_miniapp
-подпись initData не сошлась: поля=['auth_date', 'query_id', 'user'] полученный=5c7fd81552480047 расчётные=['5c7fd81552480047', '5c7fd81552480047']
-подпись initData не сошлась: поля=['auth_date', 'query_id', 'user'] полученный=5c7fd81552480047 расчётные=['108856329eef286b', '108856329eef286b']
-подпись initData не сошлась: поля=['auth_date', 'query_id', 'user'] полученный=005c7fd815524800 расчётные=['5c7fd81552480047', '5c7fd81552480047']
-initData без поля hash
+== Защита от переигрывания ==
+  ok   старый task_i -> 409
 
-== Подпись initData ==
-  ok   верная подпись принимается
-  ok   испорченная подпись отклоняется
-  ok   подпись чужого бота отклоняется
-  ok   подмена хэша отклоняется
+== Завершение урока ==
+  ok   есть счёт
+  ok   есть процент
+  ok   ошибка попала в список
+  ok   прогресс записан
 
-== Авторизация API ==
-  ok   200 со статусом
-  ok   telegram_id верный
-  ok   битая подпись -> 401
+== Слова (SRS) ==
+  ok   новые слова выданы
+  ok   есть sk/ru
+  ok   оценка принята
+  ok   интервал вырос
+  ok   новая карточка не попадает в повторение сразу
+  ok   карточка сохранена в SRS
+  ok   интервал записан
+  ok   дата следующего повторения впереди
 
-== Главный экран ==
-  FAIL есть уровень 
-Traceback (most recent call last):
-  File "/home/runner/work/slovak-bot/slovak-bot/tests/test_miniapp.py", line 214, in <module>
-    sys.exit(main())
-             ^^^^^^
-  File "/home/runner/work/slovak-bot/slovak-bot/tests/test_miniapp.py", line 101, in main
-    check("есть юниты", len(body["units"]) == 10, str(len(body["units"])))
-                            ~~~~^^^^^^^^^
-KeyError: 'units'
+== Прогресс и ошибки ==
+  ok   урок засчитан
+  ok   слова учтены
+  ok   есть дни
+  ok   есть юниты с прогрессом
+  ok   есть тег ошибки
+  ok   есть человеческое название
+
+== Тренировка ошибок и тест ==
+  ok   drill вернул задания
+  ok   тест вернул задания
+  ok   в тесте тоже нет ответов
+
+== ИИ-запросы без ключа ==
+  ok   writing -> 503
+  ok   speaking -> 503
+
+== Озвучка ==
+  ok   озвучка отключена -> 404
+
+Итого: 50 ok, 0 fail
 
 #### test_license
 == Ключ одноразовый ==
