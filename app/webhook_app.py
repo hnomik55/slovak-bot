@@ -50,6 +50,31 @@ def create_app(bot: Bot, dp: Dispatcher) -> Flask:
     app = Flask(__name__)
     app.config["JSON_AS_ASCII"] = False
 
+    # --- CORS ---
+    # Приложение может лежать на GitHub Pages (https://user.github.io/...),
+    # а API — на другом домене (туннель). Разрешаем запросы с этих адресов.
+    allowed_suffixes = ("github.io", "trycloudflare.com", "pythonanywhere.com")
+
+    @app.before_request
+    def handle_options():
+        if request.method == "OPTIONS":
+            return ("", 204)
+        return None
+
+    @app.after_request
+    def add_cors_headers(response):
+        origin = request.headers.get("Origin", "")
+        if origin and (
+            origin in ("http://localhost", "http://127.0.0.1")
+            or any(origin.endswith(suffix) for suffix in allowed_suffixes)
+        ):
+            response.headers["Access-Control-Allow-Origin"] = origin
+            response.headers["Access-Control-Allow-Headers"] = "X-Telegram-Init-Data, Content-Type"
+            response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+            response.headers["Access-Control-Max-Age"] = "3600"
+            response.headers["Vary"] = "Origin"
+        return response
+
     @app.route("/bot/<secret>", methods=["POST"])
     def telegram_webhook(secret: str):
         if not _secret_ok(secret):

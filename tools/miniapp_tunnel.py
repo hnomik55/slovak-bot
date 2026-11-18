@@ -17,11 +17,13 @@
 from __future__ import annotations
 
 import io
+import json
 import os
 import re
 import subprocess
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -114,6 +116,46 @@ def set_env_value(key: str, value: str) -> None:
         fh.write("\n".join(out) + "\n")
 
 
+def publish_config(url: str) -> None:
+    """Публикует адрес API в miniapp/config.json и отправляет в GitHub.
+
+    Приложение на GitHub Pages берёт адрес API оттуда — так его не нужно
+    передеплоивать при смене туннеля.
+    """
+    config_path = ROOT / "miniapp" / "config.json"
+    payload = {
+        "api_base": url,
+        "updated_at": datetime.now().isoformat(timespec="seconds"),
+    }
+    with io.open(config_path, "w", encoding="utf-8", newline="\n") as fh:
+        fh.write(json.dumps(payload, ensure_ascii=False, indent=1) + "\n")
+
+    git = r"C:\Program Files\Git\cmd\git.exe"
+    if not Path(git).exists():
+        print("config.json обновлён (git не найден — Pages подхватит при следующем пуше)")
+        return
+    try:
+        subprocess.run([git, "add", "miniapp/config.json"], cwd=str(ROOT), capture_output=True)
+        commit = subprocess.run(
+            [git, "commit", "-m", "chore: adres API dlya Mini App"],
+            cwd=str(ROOT),
+            capture_output=True,
+            text=True,
+        )
+        if "nothing to commit" in (commit.stdout or "") + (commit.stderr or ""):
+            print("config.json без изменений")
+            return
+        push = subprocess.run(
+            [git, "push", "origin", "main"], cwd=str(ROOT), capture_output=True, text=True
+        )
+        if push.returncode == 0:
+            print("config.json отправлен в GitHub — Pages обновится за минуту")
+        else:
+            print("config.json обновлён локально, но пуш не прошёл (нужна авторизация Git)")
+    except Exception as exc:
+        print("не удалось отправить config.json: %s" % exc)
+
+
 def start() -> int:
     if not CLOUDFLARED.exists():
         print("Не найден cloudflared:", CLOUDFLARED)
@@ -174,6 +216,13 @@ def start() -> int:
     # 3. адрес в .env + перезапуск бота
     set_env_value("WEBAPP_BASE_URL", url)
     print("WEBAPP_BASE_URL = %s" % url)
+
+    # Если приложение живёт на GitHub Pages — публикуем адрес API туда же
+    pages_url = os.environ.get("PAGES_URL", "").strip()
+    if pages_url:
+        publish_config(url)
+        set_env_value("WEBAPP_BASE_URL", pages_url)
+        print("Кнопка в боте -> %s (постоянный адрес Pages)" % pages_url)
 
     subprocess.run(
         [sys.executable, str(ROOT / "tools" / "botctl.py"), "restart"],

@@ -279,11 +279,29 @@ function esc(s) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Адрес API: если приложение лежит на GitHub Pages, а API — на другом домене,
+// адрес берём из config.json рядом с index.html. Иначе — тот же домен.
+let API_BASE = '';
+let CONFIG_LOADED = false;
+async function loadConfig() {
+  if (CONFIG_LOADED) return API_BASE;
+  CONFIG_LOADED = true;
+  try {
+    const res = await fetch('config.json', { cache: 'no-store' });
+    if (res.ok) {
+      const cfg = await res.json();
+      if (cfg && cfg.api_base) API_BASE = String(cfg.api_base).replace(/\/$/, '');
+    }
+  } catch (e) { /* остаёмся на своём домене */ }
+  return API_BASE;
+}
+
 async function apiFetch(path, opts) {
   opts = opts || {};
+  await loadConfig();
   const headers = { 'X-Telegram-Init-Data': (tg && tg.initData) || '' };
   if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
-  const res = await fetch(path, {
+  const res = await fetch(API_BASE + path, {
     method: opts.method || 'GET',
     body: opts.body,
     headers: Object.assign(headers, opts.headers || {})
