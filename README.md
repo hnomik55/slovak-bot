@@ -69,10 +69,15 @@ python tools\botctl.py restart
 прямо в Telegram, где доступно всё то же — уроки, слова, прогресс, ошибки,
 мини-тест, тренировка ошибок, озвучка. Чат и приложение работают с одной базой.
 
+**Постоянный адрес:** `https://hnomik55.github.io/slovak-bot/`
+(фронтенд лежит в `docs/` → GitHub Pages; адрес API берётся из `docs/config.json`,
+его обновляет скрипт туннеля — приложение всегда знает, где бэкенд).
+
 ```bash
 python tools\miniapp_tunnel.py start    # сервер + публичный HTTPS + кнопка в боте
 python tools\miniapp_tunnel.py status
 python tools\miniapp_tunnel.py stop
+python tools\verify_pages.py             # проверка цепочки Pages -> API
 ```
 
 Подробности — в [`deploy/miniapp.md`](deploy/miniapp.md).

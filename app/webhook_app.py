@@ -53,7 +53,7 @@ def create_app(bot: Bot, dp: Dispatcher) -> Flask:
     # --- CORS ---
     # Приложение может лежать на GitHub Pages (https://user.github.io/...),
     # а API — на другом домене (туннель). Разрешаем запросы с этих адресов.
-    allowed_suffixes = ("github.io", "trycloudflare.com", "pythonanywhere.com")
+    allowed_hosts = ("github.io", "trycloudflare.com", "pythonanywhere.com", "localhost")
 
     @app.before_request
     def handle_options():
@@ -64,10 +64,7 @@ def create_app(bot: Bot, dp: Dispatcher) -> Flask:
     @app.after_request
     def add_cors_headers(response):
         origin = request.headers.get("Origin", "")
-        if origin and (
-            origin in ("http://localhost", "http://127.0.0.1")
-            or any(origin.endswith(suffix) for suffix in allowed_suffixes)
-        ):
+        if origin and any(host in origin for host in allowed_hosts):
             response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Headers"] = "X-Telegram-Init-Data, Content-Type"
             response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
