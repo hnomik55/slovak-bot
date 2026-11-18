@@ -65,6 +65,7 @@ jobs:
         if: always()
         run: |
           git config user.name "ci" && git config user.email "ci@local"
-          git add pages-setup.txt || true
+          git checkout -B ci-logs
+          git add -A pages-setup.txt miniapp/ || true
           git commit -m "ci: pages setup log" || true
-          git push || true
+          git push -f origin ci-logs || true
