@@ -117,12 +117,12 @@ def set_env_value(key: str, value: str) -> None:
 
 
 def publish_config(url: str) -> None:
-    """Публикует адрес API в miniapp/config.json и отправляет в GitHub.
+    """Публикует адрес API в docs/config.json и отправляет в GitHub.
 
-    Приложение на GitHub Pages берёт адрес API оттуда — так его не нужно
-    передеплоивать при смене туннеля.
+    Приложение лежит в папке docs/ (GitHub Pages публикует её как корень сайта),
+    поэтому адрес API берётся оттуда — передеплоивать приложение не нужно.
     """
-    config_path = ROOT / "miniapp" / "config.json"
+    config_path = ROOT / "docs" / "config.json"
     payload = {
         "api_base": url,
         "updated_at": datetime.now().isoformat(timespec="seconds"),
@@ -135,7 +135,7 @@ def publish_config(url: str) -> None:
         print("config.json обновлён (git не найден — Pages подхватит при следующем пуше)")
         return
     try:
-        subprocess.run([git, "add", "miniapp/config.json"], cwd=str(ROOT), capture_output=True)
+        subprocess.run([git, "add", "docs/config.json"], cwd=str(ROOT), capture_output=True)
         commit = subprocess.run(
             [git, "commit", "-m", "chore: adres API dlya Mini App"],
             cwd=str(ROOT),

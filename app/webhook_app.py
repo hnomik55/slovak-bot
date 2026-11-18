@@ -115,7 +115,7 @@ def create_app(bot: Bot, dp: Dispatcher) -> Flask:
     except Exception as exc:  # не ломаем основной бот из-за Mini App
         log.warning("Mini App API не подключился: %s", exc)
 
-    miniapp_dir = Path(__file__).resolve().parent.parent / "miniapp"
+    miniapp_dir = Path(__file__).resolve().parent.parent / "docs"
 
     @app.route("/", methods=["GET"])
     def miniapp_index():
@@ -127,6 +127,14 @@ def create_app(bot: Bot, dp: Dispatcher) -> Flask:
     @app.route("/app", methods=["GET"])
     def miniapp_open():
         return miniapp_index()
+
+    @app.route("/config.json", methods=["GET"])
+    def miniapp_config():
+        """Адрес API для приложения (на GitHub Pages лежит рядом с index.html)."""
+        config = miniapp_dir / "config.json"
+        if not config.exists():
+            return jsonify({"api_base": ""})
+        return config.read_text(encoding="utf-8"), 200, {"Content-Type": "application/json"}
 
     @app.route("/static/<path:filename>")
     def miniapp_static(filename: str):

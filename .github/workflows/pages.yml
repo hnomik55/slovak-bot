@@ -1,14 +1,14 @@
 name: deploy pages
 
-# Постоянный адрес Mini App: https://hnomik55.github.io/slovak-bot/miniapp/
-# Фронтенд лежит в папке miniapp/, адрес API берётся из miniapp/config.json
+# Постоянный адрес Mini App: https://hnomik55.github.io/slovak-bot/
+# Фронтенд лежит в папке docs/, адрес API берётся из docs/config.json
 # (его обновляет tools/miniapp_tunnel.py при смене туннеля).
 
 on:
   push:
     branches: [main]
     paths:
-      - "miniapp/**"
+      - "docs/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Ensure Pages site exists (deploy from branch main, folder /miniapp)
+      - name: Ensure Pages site exists (deploy from branch main, folder /docs)
         run: |
           echo "--- состояние сайта ---"
           curl -s \
@@ -39,7 +39,7 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
               "https://api.github.com/repos/${{ github.repository }}/pages" \
-              -d '{"source":{"branch":"main","path":"/miniapp"}}' | tee -a pages-setup.txt
+              -d '{"source":{"branch":"main","path":"/docs"}}' | tee -a pages-setup.txt
           fi
 
       - name: Publish diagnostics
