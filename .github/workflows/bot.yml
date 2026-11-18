@@ -16,10 +16,10 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - "app/**"
-      - "bot.py"
-      - "data/content.json"
+    paths-ignore:
+      - "state/**"
+      - "ci-*.txt"
+      - "telegram-check.txt"
 
 concurrency:
   group: slovak-bot
