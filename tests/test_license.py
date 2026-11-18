@@ -46,7 +46,15 @@ def main() -> int:
     print("\n== Генерация ключей ==")
     codes = licensing.create_keys(3, 0, "тест", "batch-1")
     check("создано 3 ключа", len(codes) == 3, str(codes))
-    check("формат ключа", all(licensing.CODE_RE.match(c) for c in codes), str(codes))
+    check("длина ключа 20 символов", all(len(c) == 20 for c in codes), str(codes))
+    check(
+        "формат: буквы, цифры и знаки",
+        all(licensing.NEW_CODE_RE.match(c) for c in codes),
+        str(codes),
+    )
+    check("в каждом ключе есть буквы", all(any(ch.isalpha() for ch in c) for c in codes))
+    check("в каждом ключе есть цифры", all(any(ch.isdigit() for ch in c) for c in codes))
+    check("в каждом ключе есть знаки", all(any(not ch.isalnum() for ch in c) for c in codes))
     check("ключи разные", len(set(codes)) == 3)
     check(
         "ключ есть в БД",
@@ -98,11 +106,12 @@ def main() -> int:
     check("после отзыва доступа нет", not licensing.is_active(700))
 
     print("\n== Нормализация кода ==")
-    weird = " " + codes[1].replace("-", " ").lower() + " "
+    weird = " " + codes[1][:10] + " " + codes[1][10:] + " "
     canonical = licensing.normalize_code(weird)
     check("мусорный ввод нормализуется", canonical == codes[1], "%s vs %s" % (canonical, codes[1]))
     ok, message = licensing.redeem(weird, 800)
     check("нормализованный ключ работает", ok, message)
+    check("регистр не важен", licensing.normalize_code(codes[1].lower()) == codes[1])
 
     print("\n== Изоляция прогресса ==")
     db.ensure_user(500)

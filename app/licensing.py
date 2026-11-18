@@ -23,25 +23,38 @@ from typing import Any, Dict, List, Optional, Tuple
 from app import db
 from app.config import CONFIG
 
-# Алфавит без похожих символов (0/O, 1/I) — ключ легко прочитать и переписать
-ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+# Алфавит ключа: 20 символов — буквы, цифры и знаки.
+# Убраны похожие символы (O/0, I/1) — покупатель не перепутает при переписывании.
+ALPHABET = (
+    "ABCDEFGHJKLMNPQRSTUVWXYZ"   # буквы без O и I
+    "23456789"                    # цифры без 0 и 1
+    "-_!@#$%&*+=?."               # знаки
+)
+KEY_LENGTH = 20
 KEY_PREFIX = "SLOV"
 CODE_RE = re.compile(r"^SLOV(-[A-Z0-9]{5}){3}$")
+NEW_CODE_RE = re.compile(r"^[A-Z0-9\-_!@#$%&*+=?.]{20}$")
 
 PLAN_LIFETIME = "lifetime"
 PLAN_TRIAL = "trial"
 
 
 def normalize_code(raw: str) -> str:
-    """Приводит ключ к каноническому виду: SLOV-ABCDE-FGHIJ-KLMNO.
+    """Приводит ключ к каноническому виду.
 
-    Терпит к регистру, пробелам, тире и повторному префиксу SLOV.
+    Новый формат — 20 случайных символов: сохраняем как есть (регистр не важен,
+    потому что в алфавите нет строчных букв).
+    Старый формат SLOV-XXXXX-XXXXX-XXXXX — приводим к каноническому.
     """
     if not raw:
         return ""
-    cleaned = re.sub(r"[^A-Za-z0-9]", "", raw).upper()
-    # Убираем лишние повторы префикса, но не съедаем тело ключа,
-    # если оно само начинается на SLOV (алфавит это допускает)
+    text = raw.strip()
+    # Убираем пробелы и невидимые символы, которые могли прилипнуть при копировании
+    text = "".join(ch for ch in text if ch.isprintable() and ch not in " \t\u200b\u00a0")
+    if NEW_CODE_RE.match(text.upper()):
+        return text.upper()
+
+    cleaned = re.sub(r"[^A-Za-z0-9]", "", text).upper()
     while cleaned.startswith(KEY_PREFIX) and len(cleaned) > 15:
         cleaned = cleaned[len(KEY_PREFIX):]
     body = cleaned[:15].ljust(15, "X")
@@ -49,9 +62,9 @@ def normalize_code(raw: str) -> str:
 
 
 def generate_code() -> str:
+    """20 случайных символов: буквы, цифры, знаки."""
     while True:
-        body = "".join(secrets.choice(ALPHABET) for _ in range(15))
-        code = "%s-%s-%s-%s" % (KEY_PREFIX, body[0:5], body[5:10], body[10:15])
+        code = "".join(secrets.choice(ALPHABET) for _ in range(KEY_LENGTH))
         if not db.query_one("SELECT id FROM licenses WHERE code = ?", (code,)):
             return code
 
