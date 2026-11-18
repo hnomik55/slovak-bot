@@ -43,23 +43,70 @@
 Итого: 44 ok, 0 fail
 
 #### test_flow
-Traceback (most recent call last):
-  File "/home/runner/work/slovak-bot/slovak-bot/tests/test_flow.py", line 39, in <module>
-    from app.handlers import (  # noqa: E402
-  File "/home/runner/work/slovak-bot/slovak-bot/app/handlers/admin.py", line 17, in <module>
-    from app.services.ai import AI
-  File "/home/runner/work/slovak-bot/slovak-bot/app/services/ai.py", line 22, in <module>
-    import httpx
-ModuleNotFoundError: No module named 'httpx'
+  ok   перешли к следующему заданию
+
+== Задание type (ввод текстом) ==
+  ok   пришло задание на ввод
+  ok   ответ разобран
+  ok   разбор пришёл новым сообщением, а не правкой
+
+== Слова (SRS) ==
+  ok   меню слов
+  ok   кнопка новых слов
+  ok   карточка слова
+  ok   есть «Показать перевод»
+  ok   перевод показан
+  ok   оценка принята
+  ok   карточка в SRS обновилась
+
+== Прогресс и ошибки ==
+  ok   статистика
+  ok   блок ошибок
+
+== Тренировка ошибок ==
+  ok   тренажер ошибок собрал задания
+
+== Настройки ==
+  ok   меню настроек
+  ok   уровень сохранён
+
+== Мини-тест ==
+  ok   тест собрался
+
+== Шлюз лицензии ==
+  ok   без ключа бот просит ключ
+  ok   без ключа команды закрыты
+  ok   неверный ключ отклонён
+  ok   верный ключ активирует доступ
+  ok   доступ выдан
+
+== Уборка ==
+
+Итого: 40 ok, 0 fail
 
 #### test_webhook
-Traceback (most recent call last):
-  File "/home/runner/work/slovak-bot/slovak-bot/tests/test_webhook.py", line 35, in <module>
-    from app.webhook_app import create_app  # noqa: E402
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/slovak-bot/slovak-bot/app/webhook_app.py", line 27, in <module>
-    from flask import Flask, jsonify, request, send_file
-ModuleNotFoundError: No module named 'flask'
+2026-11-18 21:04:50,696 INFO    aiogram.event: Update id=1 is handled. Duration 102 ms by bot id=123456789
+2026-11-18 21:04:50,697 WARNING webhook: запрос с неверным секретом — отклонён
+2026-11-18 21:04:50,717 INFO    aiogram.event: Update id=2 is handled. Duration 20 ms by bot id=123456789
+
+== Вебхук принимает апдейт ==
+  ok   ответ 200
+  ok   бот обработал апдейт
+  ok   бот поздоровался
+
+== Неверный секрет отклоняется ==
+  ok   ответ 403
+
+== Callback-апдейт ==
+  ok   ответ 200
+  ok   меню отрисовано
+
+== Health и cron ==
+  ok   health отвечает
+  ok   cron отвечает
+  ok   cron с чужим секретом отклонён
+
+Итого: 9 ok, 0 fail
 
 #### test_tts
 
@@ -84,13 +131,32 @@ ModuleNotFoundError: No module named 'flask'
 Итого: 8 ok, 0 fail
 
 #### test_miniapp
+подпись initData не сошлась: поля=['auth_date', 'query_id', 'user'] полученный=5c7fd81552480047 расчётные=['5c7fd81552480047', '5c7fd81552480047']
+подпись initData не сошлась: поля=['auth_date', 'query_id', 'user'] полученный=5c7fd81552480047 расчётные=['108856329eef286b', '108856329eef286b']
+подпись initData не сошлась: поля=['auth_date', 'query_id', 'user'] полученный=005c7fd815524800 расчётные=['5c7fd81552480047', '5c7fd81552480047']
+initData без поля hash
+
+== Подпись initData ==
+  ok   верная подпись принимается
+  ok   испорченная подпись отклоняется
+  ok   подпись чужого бота отклоняется
+  ok   подмена хэша отклоняется
+
+== Авторизация API ==
+  ok   200 со статусом
+  ok   telegram_id верный
+  ok   битая подпись -> 401
+
+== Главный экран ==
+  FAIL есть уровень 
 Traceback (most recent call last):
-  File "/home/runner/work/slovak-bot/slovak-bot/tests/test_miniapp.py", line 34, in <module>
-    from app.miniapp_api import bp  # noqa: E402
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/slovak-bot/slovak-bot/app/miniapp_api.py", line 17, in <module>
-    from flask import Blueprint, jsonify, request
-ModuleNotFoundError: No module named 'flask'
+  File "/home/runner/work/slovak-bot/slovak-bot/tests/test_miniapp.py", line 214, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/runner/work/slovak-bot/slovak-bot/tests/test_miniapp.py", line 101, in main
+    check("есть юниты", len(body["units"]) == 10, str(len(body["units"])))
+                            ~~~~^^^^^^^^^
+KeyError: 'units'
 
 #### test_license
 == Ключ одноразовый ==
