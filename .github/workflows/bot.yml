@@ -44,6 +44,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Проверка связи с Telegram (без токена)
+        run: |
+          echo "Корень API:"
+          curl -s -o /dev/null -w "  http=%{http_code} time=%{time_total}s\n" -m 20 https://api.telegram.org/
+          echo "Bot API (фиктивный токен, ждём быстрый 404 — значит путь /bot... доступен):"
+          curl -s -o /dev/null -w "  http=%{http_code} time=%{time_total}s\n" -m 20 \
+            https://api.telegram.org/bot123456789:FAKE_TOKEN_FOR_CHECK/getMe || echo "  таймаут — путь /bot... недоступен"
+
       - name: Show content stats
         run: python -c "import json;d=json.load(open('data/content.json'));m=d['meta'];print('уроков',m['lessons'],'заданий',m['tasks'],'слов',m['vocab'])"
 
