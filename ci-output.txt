@@ -1,0 +1,136 @@
+### Результаты тестов
+
+#### test_core
+  ok   совсем другое — неверно
+  ok   второй вариант ответа
+  ok   сборка фразы ок
+  ok   сборка — другой порядок
+  ok   сборка — лишнее слово
+  ok   потерянные буквы найдены
+  ok   тег: диа_критика
+  ok   тег: падеж по уроку
+  ok   тег: глагол
+  ok   тег: лишнее слово
+
+== Интервальное повторение ==
+  ok   новое слово — интервал 1 день
+  ok   второй раз — длиннее
+  ok   забыл — сброс на 1 день
+  ok   забыл — счётчик lapses
+  ok   ease не падает ниже 1.3
+
+== База данных ==
+  ok   пользователь создан
+  ok   XP начислен
+  ok   серия дней = 1
+  ok   ошибка записана в блок ошибок
+  ok   прогресс урока сохранён
+  ok   mastery посчитан
+  ok   первый урок открыт
+  ok   все уроки доступны сразу
+  ok   строгий режим: следующий открылся после 80%
+  ok   строгий режим: после слабого результата закрыт
+  ok   словарь в БД
+
+== Markdown -> HTML ==
+  ok   заголовок
+  ok   жирный
+  ok   таблица
+  ok   экранирование
+
+== Очистка ==
+
+Итого: 44 ok, 0 fail
+
+#### test_flow
+Traceback (most recent call last):
+  File "/home/runner/work/slovak-bot/slovak-bot/tests/test_flow.py", line 39, in <module>
+    from app.handlers import (  # noqa: E402
+  File "/home/runner/work/slovak-bot/slovak-bot/app/handlers/admin.py", line 17, in <module>
+    from app.services.ai import AI
+  File "/home/runner/work/slovak-bot/slovak-bot/app/services/ai.py", line 22, in <module>
+    import httpx
+ModuleNotFoundError: No module named 'httpx'
+
+#### test_webhook
+Traceback (most recent call last):
+  File "/home/runner/work/slovak-bot/slovak-bot/tests/test_webhook.py", line 35, in <module>
+    from app.webhook_app import create_app  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/slovak-bot/slovak-bot/app/webhook_app.py", line 27, in <module>
+    from flask import Flask, jsonify, request, send_file
+ModuleNotFoundError: No module named 'flask'
+
+#### test_tts
+
+== Голоса ==
+   настроенный: sk-SK-LukasNeural
+   запасные:    sk-SK-ViktoriaNeural, sk-SK-LukasNeural
+  ok   голос по умолчанию существует
+  ok   все запасные голоса существуют
+
+== Синтез ==
+  ok   аудио получено
+  ok   файл не пустой (>1 КБ)
+  ok   это mp3 (сигнатура)
+
+== Кэш ==
+  ok   повтор отдаёт из кэша
+
+== Защита от плохих данных ==
+  ok   пустой текст не озвучивается
+  ok   пробелы не озвучиваются
+
+Итого: 8 ok, 0 fail
+
+#### test_miniapp
+Traceback (most recent call last):
+  File "/home/runner/work/slovak-bot/slovak-bot/tests/test_miniapp.py", line 34, in <module>
+    from app.miniapp_api import bp  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/slovak-bot/slovak-bot/app/miniapp_api.py", line 17, in <module>
+    from flask import Blueprint, jsonify, request
+ModuleNotFoundError: No module named 'flask'
+
+#### test_license
+== Ключ одноразовый ==
+  ok   повторный ввод отклонён
+  ok   другой человек не может использовать
+  ok   у второго нет доступа
+
+== Владелец ==
+  ok   владелец помечен как owner
+  ok   с байпасом владелец работает без ключа
+  ok   без байпаса владелец тоже требует ключ
+
+== Срок подписки ==
+  ok   ключ на 30 дней принят
+  ok   осталось ~30 дней
+  ok   подписка активна
+  ok   есть дата окончания
+
+== Продление и отзыв ==
+  ok   продление увеличивает срок
+  ok   стало больше дней
+  ok   доступ был
+  ok   после отзыва доступа нет
+
+== Нормализация кода ==
+  ok   мусорный ввод нормализуется
+  ok   нормализованный ключ работает
+  ok   регистр не важен
+
+== Изоляция прогресса ==
+  ok   прогресс пользователя 500 записан
+  ok   прогресс пользователя 900 другой
+  ok   XP раздельный
+  ok   ошибки не смешиваются
+  ok   карточки слов раздельные
+
+== Сводка ==
+  ok   счётчики считаются
+  ok   активных подписок 3 (отозванная не считается)
+  ok   список подписчиков не пуст
+
+Итого: 38 ok, 0 fail
+
