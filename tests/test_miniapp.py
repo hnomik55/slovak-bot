@@ -70,6 +70,13 @@ def main() -> int:
     content_mod.CONTENT.load(force=True)
     db.upsert_vocab(content_mod.CONTENT.vocab)
 
+    # Тестовому пользователю нужен доступ (в CI нет ADMIN_IDS)
+    from app import licensing
+
+    license_code = licensing.create_keys(1, 0, "miniapp-test")[0]
+    granted, _ = licensing.redeem(license_code, 8636653095)
+    assert granted, "не удалось выдать тестовый ключ"
+
     app = Flask(__name__)
     app.register_blueprint(bp)
     client = app.test_client()
