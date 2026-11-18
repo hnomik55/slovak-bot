@@ -46,7 +46,7 @@ jobs:
         if: always()
         run: |
           git config user.name "ci" && git config user.email "ci@local"
-          git checkout -B ci-logs
+          git checkout -B ci-tests
           git add -A ci-output.txt || true
           git commit -m "ci: output of tests" || true
-          git push -f origin ci-logs || true
+          git push -f origin ci-tests || true
