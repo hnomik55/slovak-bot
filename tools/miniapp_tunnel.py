@@ -218,11 +218,17 @@ def start() -> int:
     print("WEBAPP_BASE_URL = %s" % url)
 
     # Если приложение живёт на GitHub Pages — публикуем адрес API туда же
-    pages_url = os.environ.get("PAGES_URL", "").strip()
+    # и кнопку в боте делаем вечной (адрес Pages не меняется).
+    from app.config import CONFIG
+
+    pages_url = CONFIG.pages_url
     if pages_url:
         publish_config(url)
         set_env_value("WEBAPP_BASE_URL", pages_url)
         print("Кнопка в боте -> %s (постоянный адрес Pages)" % pages_url)
+        button_url = pages_url
+    else:
+        button_url = url
 
     subprocess.run(
         [sys.executable, str(ROOT / "tools" / "botctl.py"), "restart"],
@@ -230,7 +236,7 @@ def start() -> int:
         capture_output=True,
     )
     print("Бот перезапущен — кнопка «Открыть приложение» уже в меню.")
-    notify_new_button(url)
+    notify_new_button(button_url)
     print("")
     print("Проверить: %s/health" % url)
     return 0
@@ -255,7 +261,7 @@ def notify_new_button(url: str) -> None:
             db.init_db()
             tg_bot = Bot(token=CONFIG.bot_token, default=DefaultBotProperties(parse_mode="HTML"))
             try:
-                rows = db.query("SELECT tg_id FROM users WHERE tg_id != ?", (CONFIG.admin_ids[0] if CONFIG.admin_ids else 0,))
+                rows = db.query("SELECT tg_id FROM users")
                 kb = InlineKeyboardMarkup(
                     inline_keyboard=[
                         [

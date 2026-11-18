@@ -162,6 +162,11 @@ class Config:
     webapp_base_url: str = field(
         default_factory=lambda: os.environ.get("WEBAPP_BASE_URL", "").strip().rstrip("/")
     )
+    # Постоянный адрес на GitHub Pages (если он включён).
+    # Тогда кнопка в боте ведёт на Pages, а адрес API берётся из miniapp/config.json.
+    pages_url: str = field(
+        default_factory=lambda: os.environ.get("PAGES_URL", "").strip().rstrip("/")
+    )
     # Режим разработки: разрешает заходить в приложение из обычного браузера
     app_dev: bool = field(default_factory=lambda: _bool("APP_DEV", False))
     dev_telegram_id: int = field(default_factory=lambda: _int("DEV_TELEGRAM_ID", 8636653095))
