@@ -11,3 +11,4 @@ state/*.db-shm
 __pycache__/
 *.pyc
 .venv/
+tools/bin/
