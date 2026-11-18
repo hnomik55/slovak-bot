@@ -18,13 +18,32 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import logging
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from urllib.parse import parse_qsl
 
 from app.config import CONFIG
 
+log = logging.getLogger("miniapp.auth")
+
 MAX_AGE_SECONDS = 24 * 3600
+
+
+def _check_strings(data: Dict[str, str]) -> List[str]:
+    """Варианты data_check_string.
+
+    Telegram присылает в initData поля hash и (с недавних версий) signature.
+    В документации описаны два способа исключать их, поэтому проверяем оба:
+    без signature и с ним.
+    """
+    without_hash = {k: v for k, v in data.items() if k != "hash"}
+    without_signature = {k: v for k, v in without_hash.items() if k != "signature"}
+    variants = [without_hash, without_signature]
+    out: List[str] = []
+    for variant in variants:
+        out.append("\n".join("%s=%s" % (k, variant[k]) for k in sorted(variant)))
+    return out
 
 
 def verify_init_data(init_data: str, bot_token: str, max_age: int = MAX_AGE_SECONDS) -> Optional[Dict[str, Any]]:
@@ -40,14 +59,24 @@ def verify_init_data(init_data: str, bot_token: str, max_age: int = MAX_AGE_SECO
 
     data = dict(pairs)
     received_hash = data.pop("hash", None)
-    data.pop("signature", None)
     if not received_hash:
+        log.warning("initData без поля hash")
         return None
 
-    data_check_string = "\n".join("%s=%s" % (k, data[k]) for k in sorted(data))
     secret_key = hmac.new(b"WebAppData", bot_token.encode("utf-8"), hashlib.sha256).digest()
-    expected = hmac.new(secret_key, data_check_string.encode("utf-8"), hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(expected, received_hash):
+    calculated = []
+    for check_string in _check_strings(data):
+        calculated.append(
+            hmac.new(secret_key, check_string.encode("utf-8"), hashlib.sha256).hexdigest()
+        )
+
+    if not any(hmac.compare_digest(expected, received_hash) for expected in calculated):
+        log.warning(
+            "подпись initData не сошлась: поля=%s полученный=%s расчётные=%s",
+            sorted(data.keys()),
+            received_hash[:16],
+            [c[:16] for c in calculated],
+        )
         return None
 
     # Свежесть: чтобы украденную подпись нельзя было вечно использовать
@@ -56,6 +85,7 @@ def verify_init_data(init_data: str, bot_token: str, max_age: int = MAX_AGE_SECO
     except ValueError:
         auth_date = 0
     if auth_date and (time.time() - auth_date) > max_age:
+        log.warning("initData устарел (auth_date=%s)", auth_date)
         return None
 
     user: Dict[str, Any] = {}

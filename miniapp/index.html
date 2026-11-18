@@ -314,14 +314,55 @@ function showNoConn(retry) {
 async function loadHome(force) {
   if (!force && cache.home) return cache.home;
   try {
-    const [session, home] = await Promise.all([apiFetch('/api/session'), apiFetch('/api/home')]);
+    const session = await apiFetch('/api/session');
     if (session && session.user) user.first_name = session.user.first_name || user.first_name;
+    // Нет лицензии — показываем экран ввода ключа
+    if (session && session.license && session.license.active === false) {
+      screenLicense();
+      return null;
+    }
+    const home = await apiFetch('/api/home');
     cache.home = home;
     return home;
   } catch (e) {
+    if (String(e && e.message) === 'license_required') {
+      screenLicense();
+      return null;
+    }
     if (cache.home) return cache.home;
     throw e;
   }
+}
+
+function screenLicense() {
+  app.innerHTML = `
+    <h1>🔑 Доступ по ключу</h1>
+    <p class="muted">Этот бот — платный тренажёр словацкого. Введи ключ доступа: он
+    сработает один раз и привяжет доступ к твоему аккаунту навсегда.</p>
+    <input id="licenseInput" class="input-field" placeholder="SLOV-XXXXX-XXXXX-XXXXX" autocomplete="off" spellcheck="false">
+    <button class="btn" id="licenseBtn">Активировать</button>
+    <div id="licenseMsg" class="muted" style="margin-top:12px;"></div>
+    <p class="muted" style="margin-top:20px;">Твой прогресс, слова и ошибки хранятся только у тебя.</p>`;
+  const input = document.getElementById('licenseInput');
+  const msg = document.getElementById('licenseMsg');
+  const doIt = async function () {
+    const code = (input.value || '').trim();
+    if (!code) { msg.textContent = 'Введи ключ.'; return; }
+    haptic();
+    msg.textContent = 'Проверяю...';
+    try {
+      const res = await apiFetch('/api/redeem', { method: 'POST', body: JSON.stringify({ code: code }) });
+      msg.textContent = res.message || 'Готово!';
+      if (res.ok) { cache.home = null; setTimeout(function () { screenHome(); }, 900); }
+    } catch (e) {
+      const err = String(e && e.message || '');
+      msg.textContent = err === 'license_required' ? 'Нужен действующий ключ.' : ('Ошибка: ' + err);
+      msg.style.color = 'var(--tg-theme-text-color)';
+    }
+  };
+  document.getElementById('licenseBtn').onclick = doIt;
+  input.onkeydown = function (ev) { if (ev.key === 'Enter') doIt(); };
+  setBack(null);
 }
 async function loadUnits(force) {
   if (!force && cache.units) return cache.units;
@@ -338,6 +379,7 @@ async function loadUnits(force) {
 async function screenHome() {
   try {
     const home = await loadHome();
+    if (!home) return;
     app.innerHTML = `
       <h1>Привет, ${esc(user.first_name)}!</h1>
       <div class="stat-row">

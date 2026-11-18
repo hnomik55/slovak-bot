@@ -33,10 +33,11 @@ python bot.py
 
 ```bash
 python tests\test_core.py     # 44 проверки ядра: контент, оценки, SRS, БД, гейты
-python tests\test_flow.py     # 35 проверок сквозного сценария через aiogram
+python tests\test_flow.py     # 40 проверок сквозного сценария + шлюз лицензии
 python tests\test_webhook.py  # 9 проверок режима вебхука
 python tests\test_tts.py      # 8 проверок озвучки (синтез, кэш, голоса)
 python tests\test_miniapp.py  # 50 проверок API Mini App (в т.ч. что ответы не утекают)
+python tests\test_license.py  # 32 проверки лицензий и изоляции прогресса
 python tools\dry_run.py       # запуск без Telegram: БД, контент, планировщик
 python tools\test_voice.py    # прислать тестовое голосовое сообщение в чат
 python tools\reset_progress.py # сбросить прогресс (с бэкапом базы)
@@ -75,6 +76,22 @@ python tools\miniapp_tunnel.py stop
 ```
 
 Подробности — в [`deploy/miniapp.md`](deploy/miniapp.md).
+
+## Доступ по ключу (подписка)
+
+Бот платный: доступ открывается **одноразовым ключом**, который привязывается
+к Telegram-аккаунту покупателя. Прогресс у каждого свой (по `telegram_id`).
+
+```
+/admin_key make 10 30     # 10 ключей на 30 дней
+/admin_key make 5 0       # 5 бессрочных ключей
+/admin_key subs           # подписчики
+/admin_key revoke SLOV-…  # отозвать ключ
+```
+
+Человек без доступа видит только просьбу ввести ключ — остальные команды
+закрыты шлюзом `app/middleware.py`. Подробности и модель продаж —
+в [`deploy/license.md`](deploy/license.md).
 
 ## Команды бота
 

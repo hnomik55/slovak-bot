@@ -128,6 +128,18 @@ class Config:
     max_daily_tasks: int = field(default_factory=lambda: _int("MAX_DAILY_TASKS", 40))
     log_level: str = field(default_factory=lambda: os.environ.get("LOG_LEVEL", "INFO").strip().upper())
 
+    # --- Лицензии ---
+    # Владелец (ADMIN_IDS) работает без ключа. Выключи, чтобы проверить
+    # сценарий с ключом и на своём аккаунте.
+    owner_bypass_license: bool = field(default_factory=lambda: _bool("OWNER_BYPASS_LICENSE", True))
+    license_welcome: str = field(
+        default_factory=lambda: os.environ.get(
+            "LICENSE_WELCOME",
+            "Этот бот — платный тренажёр словацкого. Доступ открывается по ключу.\n\n"
+            "Введи ключ сюда. Он сработает один раз и привяжет доступ к твоему аккаунту навсегда.",
+        ).strip()
+    )
+
     # --- Режим запуска ---
     # polling — бот сам спрашивает Telegram (нужен постоянный процесс: ПК или VPS)
     # webhook — Telegram сам шлёт апдейты на твой URL (подходит для бесплатных

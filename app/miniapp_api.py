@@ -18,6 +18,7 @@ from flask import Blueprint, jsonify, request
 
 from app import content as content_mod
 from app import db
+from app import licensing
 from app.config import CONFIG
 from app.miniapp_auth import dev_user, verify_init_data
 from app.scoring import (
@@ -85,8 +86,47 @@ def require_user():
     user_id = current_user()
     if not user_id:
         return None, (jsonify({"error": "unauthorized"}), 401)
+    if not licensing.is_active(user_id):
+        return None, (jsonify({"error": "license_required"}), 403)
     db.ensure_user(user_id)
     return user_id, None
+
+
+def require_user_soft():
+    """Как require_user, но без проверки лицензии (для /session и /license)."""
+    user_id = current_user()
+    if not user_id:
+        return None, (jsonify({"error": "unauthorized"}), 401)
+    db.ensure_user(user_id)
+    return user_id, None
+
+
+def license_info(user_id: int) -> Dict[str, Any]:
+    days = licensing.remaining_days(user_id)
+    sub = licensing.get_subscription(user_id)
+    return {
+        "active": licensing.is_active(user_id),
+        "owner": licensing.is_owner(user_id),
+        "plan": (sub or {}).get("plan"),
+        "expires_at": (sub or {}).get("expires_at"),
+        "days_left": days,
+    }
+
+
+@bp.post("/redeem")
+def api_redeem():
+    """Активация ключа доступа."""
+    user_id, error = require_user_soft()
+    if error:
+        return error
+    data = request.get_json(silent=True) or {}
+    code = (data.get("code") or "").strip()
+    if not code:
+        return jsonify({"error": "no_code"}), 400
+    ok, message = licensing.redeem(code, user_id)
+    return jsonify({"ok": ok, "message": message, "license": license_info(user_id)}), (
+        200 if ok else 400
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -189,7 +229,7 @@ def clear_session(user_id: int) -> None:
 # --------------------------------------------------------------------------- #
 @bp.get("/session")
 def api_session():
-    user_id, error = require_user()
+    user_id, error = require_user_soft()
     if error:
         return error
     user = db.get_user(user_id) or {}
@@ -203,6 +243,7 @@ def api_session():
                 "streak": user.get("streak", 0),
                 "best_streak": user.get("best_streak", 0),
             },
+            "license": license_info(user_id),
             "app": {"title": "Slovencina", "version": "1.0"},
         }
     )

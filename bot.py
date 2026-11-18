@@ -55,6 +55,13 @@ log = logging.getLogger("bot")
 def build_dispatcher() -> Dispatcher:
     """Собирает роутеры. Порядок важен: первый подходящий забирает апдейт."""
     dp = Dispatcher(storage=MemoryStorage())
+
+    # Шлюз лицензии: без ключа доступно только введение ключа
+    from app.middleware import LicenseGate
+
+    dp.message.outer_middleware(LicenseGate())
+    dp.callback_query.outer_middleware(LicenseGate())
+
     dp.include_router(start.router)
     dp.include_router(lessons.router)
     dp.include_router(vocab.router)

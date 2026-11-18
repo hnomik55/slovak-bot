@@ -138,7 +138,19 @@ async def main() -> int:
     content_mod.CONTENT.load(force=True)
     db.upsert_vocab(content_mod.CONTENT.vocab)
 
+    # Тестовому пользователю нужен действующий ключ, иначе его встретит шлюз лицензии
+    from app import licensing
+
+    license_code = licensing.create_keys(1, 0, "flow-test")[0]
+    granted, _ = licensing.redeem(license_code, USER_ID)
+    assert granted, "не удалось выдать тестовый ключ"
+
     dp = Dispatcher(storage=MemoryStorage())
+    # Тот же шлюз лицензии, что и в боте
+    from app.middleware import LicenseGate
+
+    dp.message.outer_middleware(LicenseGate())
+    dp.callback_query.outer_middleware(LicenseGate())
     dp.include_router(start.router)
     dp.include_router(lessons.router)
     dp.include_router(vocab.router)
@@ -305,6 +317,91 @@ async def main() -> int:
     await press("nav:menu")
     await press("nav:quiz")
     check("тест собрался", any(k in session.last_text() for k in ("🎯", "Выбери", "⌨️", "Напиши", "🧩", "🔗")), session.last_text()[:120])
+
+    print("\n== Шлюз лицензии ==")
+    # Другой пользователь, без ключа
+    stranger = 424243
+    stranger_user = {"id": stranger, "is_bot": False, "first_name": "Незнакомец"}
+    uid += 1
+    await dp.feed_update(
+        BOT,
+        make_update(
+            uid,
+            {
+                "update_id": uid,
+                "message": {
+                    "message_id": uid,
+                    "date": int(datetime.now().timestamp()),
+                    "chat": {"id": stranger, "type": "private"},
+                    "from": stranger_user,
+                    "text": "/start",
+                },
+            },
+        ),
+    )
+    check("без ключа бот просит ключ", "ключ" in session.last_text().lower(), session.last_text()[:120])
+
+    # Пробуем команду без ключа — должен закрыть доступ
+    uid += 1
+    await dp.feed_update(
+        BOT,
+        make_update(
+            uid,
+            {
+                "update_id": uid,
+                "message": {
+                    "message_id": uid,
+                    "date": int(datetime.now().timestamp()),
+                    "chat": {"id": stranger, "type": "private"},
+                    "from": stranger_user,
+                    "text": "/lesson",
+                },
+            },
+        ),
+    )
+    check("без ключа команды закрыты", "ключ" in session.last_text().lower(), session.last_text()[:120])
+
+    # Неверный ключ
+    uid += 1
+    await dp.feed_update(
+        BOT,
+        make_update(
+            uid,
+            {
+                "update_id": uid,
+                "message": {
+                    "message_id": uid,
+                    "date": int(datetime.now().timestamp()),
+                    "chat": {"id": stranger, "type": "private"},
+                    "from": stranger_user,
+                    "text": "SLOV-XXXXX-XXXXX-XXXXX",
+                },
+            },
+        ),
+    )
+    check("неверный ключ отклонён", "не найден" in session.last_text().lower(), session.last_text()[:120])
+
+    # Верный ключ
+    good = licensing.create_keys(1, 0, "flow-stranger")[0]
+    uid += 1
+    await dp.feed_update(
+        BOT,
+        make_update(
+            uid,
+            {
+                "update_id": uid,
+                "message": {
+                    "message_id": uid,
+                    "date": int(datetime.now().timestamp()),
+                    "chat": {"id": stranger, "type": "private"},
+                    "from": stranger_user,
+                    "text": good,
+                },
+            },
+        ),
+    )
+    check("верный ключ активирует доступ", "✅" in session.last_text(), session.last_text()[:140])
+    check("доступ выдан", licensing.is_active(stranger))
 
     print("\n== Уборка ==")
     await BOT.session.close()

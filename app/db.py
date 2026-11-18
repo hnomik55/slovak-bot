@@ -131,6 +131,28 @@ CREATE TABLE IF NOT EXISTS generated (
     created_at TEXT
 );
 
+CREATE TABLE IF NOT EXISTS licenses (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    code       TEXT UNIQUE NOT NULL,
+    days       INTEGER DEFAULT 0,
+    note       TEXT DEFAULT '',
+    batch      TEXT DEFAULT '',
+    created_at TEXT,
+    used_by    INTEGER,
+    used_at    TEXT,
+    revoked    INTEGER DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS subscriptions (
+    telegram_id   INTEGER PRIMARY KEY,
+    license_id    INTEGER,
+    plan          TEXT,
+    activated_at  TEXT,
+    expires_at    TEXT,
+    status        TEXT DEFAULT 'active'
+);
+
+CREATE INDEX IF NOT EXISTS idx_licenses_used ON licenses(used_by);
 CREATE INDEX IF NOT EXISTS idx_attempts_user ON attempts(user_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_user_words_due ON user_words(user_id, due);
 CREATE INDEX IF NOT EXISTS idx_daily_stats_user ON daily_stats(user_id, day);

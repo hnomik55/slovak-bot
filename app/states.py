@@ -23,3 +23,7 @@ class SpeakingFlow(StatesGroup):
 
 class SettingsFlow(StatesGroup):
     pick = State()  # ждём выбор значения настройки
+
+
+class LicenseFlow(StatesGroup):
+    key = State()  # ждём ключ доступа
