@@ -98,6 +98,20 @@ python tools\verify_pages.py             # проверка цепочки Pages
 закрыты шлюзом `app/middleware.py`. Подробности и модель продаж —
 в [`deploy/license.md`](deploy/license.md).
 
+## Бот без твоего ПК (GitHub Actions)
+
+Чтобы чат-бот отвечал, когда компьютер выключен, он переезжает в GitHub Actions:
+просыпается каждые 3 минуты, отвечает на накопленные сообщения и засыпает.
+
+```bash
+python tools\bot_mode.py cloud     # бот в облаке, локальный остановлен
+python tools\bot_mode.py local     # вернуть на ПК
+```
+
+Нужен секрет `BOT_TOKEN` в **Settings → Secrets and variables → Actions**.
+Подробности и цена (задержка ответа 0–5 минут) — в
+[`deploy/cloud.md`](deploy/cloud.md).
+
 ## Команды бота
 
 | Команда | Что делает |
