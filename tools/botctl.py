@@ -52,6 +52,22 @@ def read_pid() -> int:
     return 0
 
 
+def _spawn(cmd, log, cwd):
+    log.parent.mkdir(parents=True, exist_ok=True)
+    handle = open(log, "a", encoding="utf-8", errors="replace")
+    flags = CREATE_NEW_PROCESS_GROUP | DETACHED_PROCESS
+    proc = subprocess.Popen(
+        cmd,
+        cwd=str(cwd),
+        stdout=handle,
+        stderr=subprocess.STDOUT,
+        stdin=subprocess.DEVNULL,
+        creationflags=flags,
+        env={**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUNBUFFERED": "1"},
+    )
+    return proc
+
+
 def do_start() -> int:
     pid = read_pid()
     if pid and _alive(pid):
@@ -61,20 +77,14 @@ def do_start() -> int:
         print("BOT_TOKEN не задан — впиши его в .env")
         return 1
 
-    LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
-    handle = open(LOG_FILE, "a", encoding="utf-8", errors="replace")
-    flags = CREATE_NEW_PROCESS_GROUP | DETACHED_PROCESS
-    proc = subprocess.Popen(
-        [sys.executable, str(ROOT / "bot.py")],
-        cwd=str(ROOT),
-        stdout=handle,
-        stderr=subprocess.STDOUT,
-        stdin=subprocess.DEVNULL,
-        creationflags=flags,
-        env={**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUNBUFFERED": "1"},
+    # Через сторожа: бот переживает обрывы связи (VPN) и падения
+    proc = _spawn(
+        [sys.executable, str(ROOT / "tools" / "bot_supervisor.py")],
+        LOG_FILE,
+        ROOT,
     )
     PID_FILE.write_text(str(proc.pid))
-    time.sleep(2.5)
+    time.sleep(3.0)
     if _alive(proc.pid):
         print("Бот запущен (PID %d). Лог: %s" % (proc.pid, LOG_FILE))
         return 0

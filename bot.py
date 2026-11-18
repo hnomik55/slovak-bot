@@ -26,6 +26,11 @@ import sys
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
+from aiogram.exceptions import (
+    TelegramConflictError,
+    TelegramNetworkError,
+    TelegramServerError,
+)
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from app.config import CONFIG
@@ -111,23 +116,35 @@ async def run_polling(bot: Bot, dp: Dispatcher) -> None:
         except Exception as exc:
             log.warning("не удалось разослать догоняющие напоминания: %s", exc)
 
-        if CONFIG.run_seconds > 0:
-            # Режим "пожил несколько минут и выключился" — для GitHub Actions.
-            # Telegram хранит непрочитанные апдейты 24 часа, поэтому накопленное
-            # не теряется: сообщения придут в следующем запуске.
-            log.info("работаю %d секунд, потом выключусь", CONFIG.run_seconds)
-            polling = asyncio.create_task(dp.start_polling(bot))
+        while True:
             try:
-                await asyncio.wait_for(asyncio.shield(polling), timeout=CONFIG.run_seconds)
-            except asyncio.TimeoutError:
-                log.info("время вышло, останавливаюсь")
-                polling.cancel()
-                try:
-                    await polling
-                except asyncio.CancelledError:
-                    pass
-        else:
-            await dp.start_polling(bot)
+                if CONFIG.run_seconds > 0:
+                    # Режим "пожил несколько минут и выключился" — для GitHub Actions.
+                    # Telegram хранит непрочитанные апдейты 24 часа, поэтому накопленное
+                    # не теряется: сообщения придут в следующем запуске.
+                    log.info("работаю %d секунд, потом выключусь", CONFIG.run_seconds)
+                    polling = asyncio.create_task(dp.start_polling(bot))
+                    try:
+                        await asyncio.wait_for(asyncio.shield(polling), timeout=CONFIG.run_seconds)
+                    except asyncio.TimeoutError:
+                        log.info("время вышло, останавливаюсь")
+                        polling.cancel()
+                        try:
+                            await polling
+                        except asyncio.CancelledError:
+                            pass
+                    return
+                await dp.start_polling(bot)
+                return
+            except TelegramConflictError:
+                # Такой же бот уже работает (например, локальный и облачный).
+                log.error(
+                    "другой экземпляр бота уже забирает сообщения — выхожу, чтобы не драться"
+                )
+                return
+            except (TelegramServerError, TelegramNetworkError) as exc:
+                log.warning("сбой связи с Telegram (%s) — перезапускаю через 10 секунд", exc)
+                await asyncio.sleep(10)
     finally:
         if scheduler:
             scheduler.shutdown(wait=False)
