@@ -52,6 +52,9 @@ class LicenseGate(BaseMiddleware):
             return None
 
         if isinstance(event, CallbackQuery):
+            # Кнопки, связанные с получением ключа, должны работать
+            if (event.data or "").startswith("nav:license"):
+                return await handler(event, data)
             await event.answer("🔑 Сначала нужен ключ доступа (/start)", show_alert=True)
             return None
 
