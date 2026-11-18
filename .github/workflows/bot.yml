@@ -87,7 +87,17 @@ jobs:
             echo "Добавь: Settings -> Secrets and variables -> Actions -> BOT_TOKEN"
             exit 0
           fi
-          python bot.py
+          python bot.py 2>&1 | tee bot-run.log || true
+
+      - name: Публикуем лог запуска бота
+        if: always()
+        run: |
+          git config user.name "ci" && git config user.email "ci@local"
+          git checkout -B ci-bot-logs
+          git add -A telegram-check.txt bot-run.log || true
+          git commit -m "ci: лог запуска бота" || true
+          git push -f origin ci-bot-logs || true
+          git checkout -f main || true
 
       - name: Save progress (state/slovak.db)
         run: |

@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import sys
 
 from aiogram import Bot, Dispatcher
@@ -104,6 +105,17 @@ async def startup(bot: Bot) -> None:
     log.info("админы: %s", CONFIG.admin_ids)
 
 
+async def _watchdog(seconds: int) -> None:
+    """Страховка: если бот не завершился за отведённое время — убиваем процесс.
+
+    Нужна для GitHub Actions: зависший процесс съедает минуты и не даёт
+    workflow дойти до шага сохранения состояния.
+    """
+    await asyncio.sleep(seconds)
+    log.error("watchdog: процесс не завершился за %d с — выхожу жёстко", seconds)
+    os._exit(0)
+
+
 async def run_polling(bot: Bot, dp: Dispatcher) -> None:
     scheduler = start_scheduler(bot)
     try:
@@ -123,6 +135,7 @@ async def run_polling(bot: Bot, dp: Dispatcher) -> None:
                     # Telegram хранит непрочитанные апдейты 24 часа, поэтому накопленное
                     # не теряется: сообщения придут в следующем запуске.
                     log.info("работаю %d секунд, потом выключусь", CONFIG.run_seconds)
+                    watchdog = asyncio.create_task(_watchdog(CONFIG.run_seconds + 90))
                     polling = asyncio.create_task(dp.start_polling(bot))
                     try:
                         await asyncio.wait_for(asyncio.shield(polling), timeout=CONFIG.run_seconds)
@@ -130,9 +143,16 @@ async def run_polling(bot: Bot, dp: Dispatcher) -> None:
                         log.info("время вышло, останавливаюсь")
                         polling.cancel()
                         try:
-                            await polling
-                        except asyncio.CancelledError:
+                            await asyncio.wait_for(polling, timeout=15)
+                        except (asyncio.TimeoutError, asyncio.CancelledError):
                             pass
+                    finally:
+                        watchdog.cancel()
+                    if not polling.done():
+                        # процесс не завершился — выходим жёстко, иначе workflow зависнет
+                        log.warning("завершаю процесс принудительно")
+                        await AI.close()
+                        os._exit(0)
                     return
                 await dp.start_polling(bot)
                 return
