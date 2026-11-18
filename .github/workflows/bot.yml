@@ -49,20 +49,10 @@ jobs:
           {
             echo "Корень API:"
             curl -s -o /dev/null -w "  http=%{http_code} time=%{time_total}s\n" -m 20 https://api.telegram.org/
-            echo "Bot API (фиктивный токен, ждём быстрый 404 — значит путь /bot... доступен):"
+            echo "Bot API (фиктивный токен, ждём быстрый 401 — значит путь /bot... доступен):"
             curl -s -w "\n  http=%{http_code} time=%{time_total}s\n" -m 20 \
               https://api.telegram.org/bot123456789:FAKE_TOKEN_FOR_CHECK/getMe || echo "  таймаут — путь /bot... недоступен"
           } | tee telegram-check.txt
-
-      - name: Публикуем результат проверки
-        if: always()
-        run: |
-          git config user.name "ci" && git config user.email "ci@local"
-          git checkout -B ci-bot-logs
-          git add -A telegram-check.txt || true
-          git commit -m "ci: проверка связи с Telegram" || true
-          git push -f origin ci-bot-logs || true
-          git checkout -f main || true
 
       - name: Show content stats
         run: python -c "import json;d=json.load(open('data/content.json'));m=d['meta'];print('уроков',m['lessons'],'заданий',m['tasks'],'слов',m['vocab'])"
