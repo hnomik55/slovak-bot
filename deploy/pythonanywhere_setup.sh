@@ -93,6 +93,7 @@ EOF
     echo "sys.path.insert(0, \"$USER_SITE\")" >> "$WSGI"
   fi
   echo "from wsgi import app  # noqa: E402" >> "$WSGI"
+  echo "application = app  # PythonAnywhere ищет именно application" >> "$WSGI"
   echo "    записан: $WSGI"
 else
   echo "    ВНИМАНИЕ: не нашёл WSGI-файл ($WSGI)"
@@ -108,6 +109,7 @@ EOF
     echo "sys.path.insert(0, \"$USER_SITE\")"
   fi
   echo "from wsgi import app"
+  echo "application = app"
 fi
 
 echo "--- 5. Регистрируем вебхук ---"

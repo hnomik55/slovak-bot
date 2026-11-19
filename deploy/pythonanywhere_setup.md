@@ -56,6 +56,7 @@ os.chdir(PROJECT)
 os.environ.setdefault("MODE", "webhook")
 
 from wsgi import app  # noqa: E402
+application = app
 ```
 
 > Замени `<твой-логин>` на свой (это часть адреса pythonanywhere.com).
