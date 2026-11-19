@@ -47,7 +47,8 @@ def ensure_secret() -> str:
 
 async def api(method: str) -> None:
     url = "https://api.telegram.org/bot%s/%s" % (CONFIG.bot_token, method)
-    async with httpx.AsyncClient(timeout=30) as client:
+    # trust_env=False — не идём через системный прокси (хостинги с прокси режут /bot)
+    async with httpx.AsyncClient(timeout=30, trust_env=False) as client:
         response = await client.get(url)
         print(response.json())
 
