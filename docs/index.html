@@ -286,6 +286,10 @@ let CONFIG_LOADED = false;
 async function loadConfig() {
   if (CONFIG_LOADED) return API_BASE;
   CONFIG_LOADED = true;
+  // На своём хостинге (не GitHub Pages) API всегда на том же домене:
+  // так приложение не зависит от того, что записано в config.json.
+  const onPages = /(^|\.)github\.io$/i.test(location.hostname);
+  if (!onPages) return API_BASE;
   try {
     const res = await fetch('config.json', { cache: 'no-store' });
     if (res.ok) {
