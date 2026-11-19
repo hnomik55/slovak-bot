@@ -91,7 +91,7 @@ class TTS:
             import httpx
 
             self.cache_dir.mkdir(parents=True, exist_ok=True)
-            async with httpx.AsyncClient(timeout=45, follow_redirects=True) as client:
+            async with httpx.AsyncClient(timeout=45, follow_redirects=True, trust_env=CONFIG.use_system_proxy) as client:
                 response = await client.get(
                     "https://translate.google.com/translate_tts",
                     params={"ie": "UTF-8", "client": "tw-ob", "tl": "sk", "q": text},

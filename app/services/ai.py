@@ -85,7 +85,7 @@ class AIService:
 
     async def client(self) -> httpx.AsyncClient:
         if self._client is None:
-            self._client = httpx.AsyncClient(timeout=CONFIG.ai_timeout)
+            self._client = httpx.AsyncClient(timeout=CONFIG.ai_timeout, trust_env=CONFIG.use_system_proxy)
         return self._client
 
     async def close(self) -> None:

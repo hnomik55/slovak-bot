@@ -27,6 +27,7 @@ import sys
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.exceptions import (
     TelegramConflictError,
     TelegramNetworkError,
@@ -200,7 +201,11 @@ async def main() -> int:
         )
         return 1
 
-    bot = Bot(token=token, default=DefaultBotProperties(parse_mode="HTML"))
+    bot = Bot(
+        token=token,
+        default=DefaultBotProperties(parse_mode="HTML"),
+        session=AiohttpSession(trust_env=CONFIG.use_system_proxy),
+    )
     dp = build_dispatcher()
 
     if CONFIG.bot_mode == "cloud":

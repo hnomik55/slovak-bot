@@ -160,6 +160,17 @@ class Config:
     # Нужно для GitHub Actions: каждый запуск живёт несколько минут и выключается.
     run_seconds: int = field(default_factory=lambda: _int("RUN_SECONDS", 0))
 
+    # --- Прокси ---
+    # На бесплатных хостингах (PythonAnywhere) прямой выход в интернет закрыт,
+    # весь трафик идёт через их прокси (HTTP_PROXY/HTTPS_PROXY в окружении).
+    # По умолчанию определяем автоматически; можно задать USE_SYSTEM_PROXY=1/0.
+    use_system_proxy: bool = field(
+        default_factory=lambda: _bool(
+            "USE_SYSTEM_PROXY",
+            bool(os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")),
+        )
+    )
+
     # --- Mini App ---
     # Базовый публичный HTTPS-адрес, где живёт приложение.
     # Примеры: https://xxx.trycloudflare.com или https://username.pythonanywhere.com
