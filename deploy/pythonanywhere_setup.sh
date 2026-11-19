@@ -15,7 +15,8 @@ set -uo pipefail
 
 REPO_URL="https://github.com/hnomik55/slovak-bot.git"
 APP_DIR="$HOME/slovak-bot"
-DOMAIN="$(hostname -d 2>/dev/null || hostname)"
+# Домен берём из имени пользователя (в контейнере hostname не совпадает с доменом)
+DOMAIN="$(id -un).pythonanywhere.com"
 BASE="https://${DOMAIN}"
 
 echo "==========================================="
