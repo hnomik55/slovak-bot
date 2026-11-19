@@ -54,10 +54,10 @@ USER_SITE=""
 if [ -n "$VENV_PY" ]; then
   echo "    использую venv: $VENV_PY"
   "$VENV_PY" -m pip install -q --upgrade pip
-  "$VENV_PY" -m pip install -q -r requirements.txt
+  "$VENV_PY" -m pip install -q -r requirements-lite.txt
 else
-  echo "    venv не найден — ставлю в --user"
-  python3 -m pip install -q --user -r requirements.txt || python3 -m pip install -q -r requirements.txt
+  echo "    venv не найден — ставлю облегчённый набор в --user"
+  python3 -m pip install -q --user -r requirements-lite.txt || python3 -m pip install -q -r requirements-lite.txt
   USER_SITE="$(python3 -c 'import site; print(site.getusersitepackages())')"
   echo "    пакеты в: $USER_SITE"
 fi
