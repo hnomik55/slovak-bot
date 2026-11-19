@@ -23,6 +23,7 @@ from pathlib import Path
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.types import Update
 from flask import Flask, jsonify, request, send_file
 
@@ -152,7 +153,11 @@ def build_wsgi_app() -> Flask:
     """
     from bot import build_dispatcher, startup
 
-    bot = Bot(token=CONFIG.bot_token, default=DefaultBotProperties(parse_mode="HTML"))
+    bot = Bot(
+        token=CONFIG.bot_token,
+        default=DefaultBotProperties(parse_mode="HTML"),
+        session=AiohttpSession(trust_env=CONFIG.use_system_proxy),
+    )
     dp = build_dispatcher()
     try:
         _run(startup(bot))
