@@ -60,14 +60,20 @@ def _list(name: str) -> List[int]:
 
 
 def _has_system_proxy() -> bool:
-    """Есть ли в окружении системный прокси (в любом регистре)."""
-    try:
-        from urllib.request import getproxies
+    """Есть ли системный прокси именно в переменных окружения.
 
-        return bool(getproxies())
-    except Exception:
-        pass
-    for key in ("HTTPS_PROXY", "HTTP_PROXY", "https_proxy", "http_proxy", "ALL_PROXY", "all_proxy"):
+    ВАЖНО: urllib.getproxies() на Windows читает ещё и реестр, где VPN
+    прописывает свой прокси. Его мы не учитываем: на ПК нужен прямой выход
+    (он работает), а на хостинге — переменные HTTP_PROXY/https_proxy.
+    """
+    for key in (
+        "HTTPS_PROXY",
+        "HTTP_PROXY",
+        "ALL_PROXY",
+        "https_proxy",
+        "http_proxy",
+        "all_proxy",
+    ):
         if os.environ.get(key):
             return True
     return False
