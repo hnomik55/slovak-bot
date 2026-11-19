@@ -98,19 +98,26 @@ python tools\verify_pages.py             # проверка цепочки Pages
 закрыты шлюзом `app/middleware.py`. Подробности и модель продаж —
 в [`deploy/license.md`](deploy/license.md).
 
-## Бот без твоего ПК (GitHub Actions)
+## Бот без твоего ПК
 
-Чтобы чат-бот отвечал, когда компьютер выключен, он переезжает в GitHub Actions:
-просыпается каждые 3 минуты, отвечает на накопленные сообщения и засыпает.
+Чтобы чат-бот отвечал, когда компьютер выключен, есть два пути:
+
+| Схема | Ответы | Условия | Комментарий |
+|---|---|---|---|
+| **Бот на ПК** (сейчас) | мгновенно | ПК включён | VPN режет Bot API — нужен split tunneling для `api.telegram.org` |
+| **PythonAnywhere** | мгновенно | ничего, нужен аккаунт | бот в webhook-режиме + API + приложение там же |
+| GitHub Actions | раз в 46–82 мин | ничего | cron у публичных репо идёт нерегулярно — для чата не годится |
+
+Инструкция по PythonAnywhere (бесплатно, без карты):
+[`deploy/pythonanywhere_setup.md`](deploy/pythonanywhere_setup.md).
+Разбор ограничений Actions — в [`deploy/cloud.md`](deploy/cloud.md).
+
+Переключение локального/облачного режима:
 
 ```bash
-python tools\bot_mode.py cloud     # бот в облаке, локальный остановлен
-python tools\bot_mode.py local     # вернуть на ПК
+python tools\bot_mode.py local   # чат-бот на этом ПК
+python tools\bot_mode.py cloud   # чат-бот в GitHub Actions
 ```
-
-Нужен секрет `BOT_TOKEN` в **Settings → Secrets and variables → Actions**.
-Подробности и цена (задержка ответа 0–5 минут) — в
-[`deploy/cloud.md`](deploy/cloud.md).
 
 ## Команды бота
 
