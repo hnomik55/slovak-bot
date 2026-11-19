@@ -112,7 +112,26 @@ python tools\verify_pages.py             # проверка цепочки Pages
 [`deploy/pythonanywhere_setup.md`](deploy/pythonanywhere_setup.md).
 Разбор ограничений Actions — в [`deploy/cloud.md`](deploy/cloud.md).
 
-Переключение локального/облачного режима:
+**Короткий путь:**
+
+1. Регистрация на [pythonanywhere.com](https://www.pythonanywhere.com) (Free, без карты)
+2. В панели: **Web** → **Add web app** → Flask → домен `твой-логин.pythonanywhere.com`
+3. В консоли **Bash** — одна команда:
+
+```bash
+bash -c "$(curl -s https://raw.githubusercontent.com/hnomik55/slovak-bot/main/deploy/pythonanywhere_setup.sh)"
+```
+
+Скрипт спросит токен и id, скачает код, поставит зависимости, напишет `.env`
+и WSGI-файл, зарегистрирует вебхук. Останется нажать **Reload** в панели.
+
+4. Сообщи мне домен — я переключу кнопку в боте на новый адрес одной командой:
+
+```bash
+python tools\switch_to_pythonanywhere.py твой-логин.pythonanywhere.com
+```
+
+И переключение локального/облачного режима:
 
 ```bash
 python tools\bot_mode.py local   # чат-бот на этом ПК
