@@ -1,0 +1,5 @@
+Корень API:
+  http=302 time=0.385929s
+Bot API (фиктивный токен, ждём быстрый 401 — значит путь /bot... доступен):
+{"ok":false,"error_code":401,"description":"Unauthorized"}
+  http=401 time=0.353321s
