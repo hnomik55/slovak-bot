@@ -157,11 +157,13 @@ async def run_polling(bot: Bot, dp: Dispatcher) -> None:
                 await dp.start_polling(bot)
                 return
             except TelegramConflictError:
-                # Такой же бот уже работает (например, локальный и облачный).
-                log.error(
-                    "другой экземпляр бота уже забирает сообщения — выхожу, чтобы не драться"
+                # Токен держит другой экземпляр (например, облачный в Actions).
+                # Не ругаемся и не выходим — подождём и перехватим токен.
+                log.warning(
+                    "токен занят другим экземпляром — жду 60 секунд и пробую снова"
                 )
-                return
+                await asyncio.sleep(60)
+                continue
             except (TelegramServerError, TelegramNetworkError) as exc:
                 log.warning("сбой связи с Telegram (%s) — перезапускаю через 10 секунд", exc)
                 await asyncio.sleep(10)
