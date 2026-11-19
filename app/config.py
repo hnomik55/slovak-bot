@@ -59,6 +59,20 @@ def _list(name: str) -> List[int]:
     return out
 
 
+def _has_system_proxy() -> bool:
+    """Есть ли в окружении системный прокси (в любом регистре)."""
+    try:
+        from urllib.request import getproxies
+
+        return bool(getproxies())
+    except Exception:
+        pass
+    for key in ("HTTPS_PROXY", "HTTP_PROXY", "https_proxy", "http_proxy", "ALL_PROXY", "all_proxy"):
+        if os.environ.get(key):
+            return True
+    return False
+
+
 def _path(name: str, default: Path) -> Path:
     """Путь из окружения. Относительный разрешаем от корня проекта.
 
@@ -164,11 +178,9 @@ class Config:
     # На бесплатных хостингах (PythonAnywhere) прямой выход в интернет закрыт,
     # весь трафик идёт через их прокси (HTTP_PROXY/HTTPS_PROXY в окружении).
     # По умолчанию определяем автоматически; можно задать USE_SYSTEM_PROXY=1/0.
+    # Учитываем и строчные http_proxy/https_proxy (так их задаёт PythonAnywhere).
     use_system_proxy: bool = field(
-        default_factory=lambda: _bool(
-            "USE_SYSTEM_PROXY",
-            bool(os.environ.get("HTTPS_PROXY") or os.environ.get("HTTP_PROXY")),
-        )
+        default_factory=lambda: _bool("USE_SYSTEM_PROXY", _has_system_proxy())
     )
 
     # --- Mini App ---
