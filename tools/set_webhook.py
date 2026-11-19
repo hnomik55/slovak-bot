@@ -45,26 +45,37 @@ def ensure_secret() -> str:
     return secret
 
 
-async def api(method: str) -> None:
+async def api(method: str) -> bool:
+    """Запрос к Bot API. Пробует оба пути: через прокси хостинга и напрямую.
+
+    На бесплатном PythonAnywhere прямой выход закрыт (Cannot connect), а через
+    прокси работает. Локально наоборот: прямой работает, прокси VPN мешает.
+    Поэтому просто пробуем по очереди — какая схема сработает, та и верна.
+    """
     url = "https://api.telegram.org/bot%s/%s" % (CONFIG.bot_token, method)
-    # На хостинге с прокси идём через него, локально — напрямую
-    async with httpx.AsyncClient(
-        timeout=30, trust_env=CONFIG.use_system_proxy
-    ) as client:
-        response = await client.get(url)
-        print(response.json())
+    for trust in (CONFIG.use_system_proxy, not CONFIG.use_system_proxy):
+        label = "через прокси" if trust else "напрямую"
+        try:
+            async with httpx.AsyncClient(timeout=30, trust_env=trust) as client:
+                response = await client.get(url)
+            data = response.json()
+        except Exception as exc:
+            print("  %s -> не вышло: %s" % (label, type(exc).__name__))
+            continue
+        print("  %s -> %s" % (label, data))
+        if data.get("ok"):
+            return True
+    return False
 
 
 async def main() -> int:
     action = sys.argv[1] if len(sys.argv) > 1 else "info"
 
     if action == "info":
-        await api("getWebhookInfo")
-        return 0
+        return 0 if await api("getWebhookInfo") else 1
 
     if action == "delete":
-        await api("deleteWebhook")
-        return 0
+        return 0 if await api("deleteWebhook") else 1
 
     if action == "set":
         if len(sys.argv) < 3:
@@ -74,11 +85,14 @@ async def main() -> int:
         secret = ensure_secret()
         url = "%s/bot/%s" % (base, secret)
         print("Регистрирую вебхук: %s" % url)
-        await api("setWebhook?url=%s&secret_token=%s&allowed_updates=%s" % (
-            url,
-            secret,
-            "message%2Cedited_message%2Ccallback_query",
-        ))
+        ok = await api(
+            "setWebhook?url=%s&secret_token=%s&allowed_updates=%s"
+            % (url, secret, "message%2Cedited_message%2Ccallback_query")
+        )
+        if not ok:
+            print("\nНЕ ПОЛУЧИЛОСЬ: ни прямой путь, ни прокси не сработали.")
+            print("Проверь связь: python3 tools/net_test.py")
+            return 1
         print("\nГотово. Проверка:")
         await api("getWebhookInfo")
         print("\nТеперь допиши в .env:")
