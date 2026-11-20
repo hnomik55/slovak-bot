@@ -86,8 +86,13 @@ async def startup(bot: Bot) -> None:
     """Инициализация БД и контента. Вызывается в обоих режимах."""
     from app import content as content_mod
     from app import db
+    from app import licensing as licensing_mod
 
     db.init_db()
+    try:
+        licensing_mod.bootstrap()
+    except Exception as exc:  # ключи не должны мешать запуску бота
+        log.warning("не удалось подхватить ключи из файлов: %s", exc)
     if not CONFIG.content_path.exists():
         log.warning("content.json не найден — запусти python tools/build_content.py")
     else:

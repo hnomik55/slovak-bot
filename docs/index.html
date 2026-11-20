@@ -215,6 +215,361 @@ table.rule-table td:first-child { color: var(--tg-theme-hint-color); }
 .tab { flex: 1; padding: 10px; border: none; border-radius: 10px; background: var(--tg-theme-secondary-bg-color); color: var(--tg-theme-text-color); cursor: pointer; }
 .tab.active { background: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); }
 </style>
+<style id="skin">
+/* ============ Дизайн v2 ============ */
+:root {
+  --bg: #080d1a;
+  --bg-2: #0e1830;
+  --surface: rgba(255, 255, 255, .055);
+  --surface-2: rgba(255, 255, 255, .095);
+  --line: rgba(255, 255, 255, .10);
+  --text: #eaf0ff;
+  --muted: #8fa0c4;
+  --accent: #4f8cff;
+  --accent-2: #8b5cf6;
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --bad: #fb7185;
+  --radius: 20px;
+  --shadow: 0 18px 40px rgba(0, 0, 0, .35);
+}
+* { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+*::before, *::after { box-sizing: border-box; }
+html, body { background: var(--bg); }
+body {
+  color: var(--text);
+  background:
+    radial-gradient(900px 520px at 8% -8%, rgba(79, 140, 255, .30), transparent 60%),
+    radial-gradient(760px 460px at 105% 4%, rgba(139, 92, 246, .24), transparent 58%),
+    radial-gradient(680px 420px at 50% 108%, rgba(52, 211, 153, .14), transparent 62%),
+    linear-gradient(180deg, #080d1a 0%, #0a1226 48%, #080d1a 100%);
+  background-attachment: fixed;
+}
+.app {
+  max-width: 460px;
+  padding: 18px 16px 40px;
+}
+.app > * { animation: fadeUp .32s cubic-bezier(.2, .8, .2, 1) both; }
+.app.enter { animation: none; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px) scale(.995); }
+  to { opacity: 1; transform: none; }
+}
+h1 { font-size: 26px; font-weight: 750; letter-spacing: -.02em; margin: 6px 0 14px; }
+h2 { font-size: 18px; font-weight: 650; letter-spacing: -.01em; margin: 10px 0 8px; }
+h3 { font-size: 15px; font-weight: 650; margin: 8px 0 8px; color: #cdd9f6; }
+p { line-height: 1.55; }
+.muted { color: var(--muted); }
+
+.card {
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .075), rgba(255, 255, 255, .035));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin: 12px 0;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* --- Главный экран --- */
+.hero { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+.hero h1 { margin: 0; overflow-wrap: anywhere; }
+.hero > div:first-child { min-width: 0; }
+.hero .pill { flex: 0 0 auto; }
+.hero .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 13px; border-radius: 999px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, .22), rgba(251, 146, 60, .14));
+  border: 1px solid rgba(251, 191, 36, .35);
+  color: #ffd88a; font-weight: 700; font-size: 14px; white-space: nowrap;
+}
+
+.ring-card { display: flex; align-items: center; gap: 18px; padding: 18px; }
+.ring { position: relative; width: 118px; height: 118px; flex: 0 0 118px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: rgba(255, 255, 255, .09); stroke-width: 10; }
+.ring-fg {
+  fill: none; stroke: url(#ringGrad); stroke-width: 10; stroke-linecap: round;
+  stroke-dasharray: 326.7; stroke-dashoffset: 326.7;
+  transition: stroke-dashoffset 1.1s cubic-bezier(.2, .8, .2, 1);
+  filter: drop-shadow(0 0 8px rgba(79, 140, 255, .55));
+}
+.ring-label {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px;
+}
+.ring-label b { font-size: 26px; font-weight: 800; letter-spacing: -.03em; }
+.ring-label span { font-size: 11px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+.ring-side { flex: 1; min-width: 0; }
+.ring-side .big { font-size: 15px; font-weight: 650; line-height: 1.35; }
+
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 4px; }
+.chips .pill { background: var(--surface); border-color: var(--line); color: var(--text); font-weight: 600; }
+.chips .pill b { color: #9fc2ff; }
+
+.stat-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.stat-row > *, .grid-btns > * { min-width: 0; }
+.stat {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .03));
+  border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px;
+}
+.stat .label { font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.stat .value { font-size: 22px; font-weight: 750; margin-top: 4px; letter-spacing: -.02em; }
+
+.grid-btns { gap: 11px; margin-top: 14px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.tile {
+  position: relative; overflow: hidden;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .085), rgba(255, 255, 255, .035));
+  border: 1px solid var(--line);
+  border-radius: 18px; min-height: 82px;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  gap: 6px; padding: 14px; font-size: 14.5px; font-weight: 620; line-height: 1.25;
+  transition: transform .16s ease, background .2s ease;
+}
+.tile::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(120px 60px at 100% 0%, rgba(79, 140, 255, .22), transparent 70%);
+  opacity: .9; pointer-events: none;
+}
+.tile:active { transform: scale(.97); background: var(--surface-2); }
+
+/* --- Кнопки --- */
+.btn {
+  position: relative; height: 52px; border-radius: 16px;
+  background: linear-gradient(135deg, #4f8cff, #7c5cff);
+  color: #fff; font-size: 16px; font-weight: 650; letter-spacing: -.01em;
+  box-shadow: 0 10px 24px rgba(79, 140, 255, .30);
+  transition: transform .16s ease, box-shadow .2s ease, opacity .2s ease;
+}
+.btn:active { transform: scale(.975); box-shadow: 0 6px 16px rgba(79, 140, 255, .24); }
+.btn.secondary {
+  background: var(--surface); color: var(--text); border: 1px solid var(--line); box-shadow: none;
+}
+.btn.ghost { background: transparent; border: 1px solid var(--line); color: var(--text); box-shadow: none; }
+.btn.danger { background: linear-gradient(135deg, #f87171, #fb7185); box-shadow: 0 10px 24px rgba(248, 113, 113, .26); }
+.btn.outline-accent { background: transparent; border: 1.5px solid rgba(79, 140, 255, .65); color: #a8c6ff; box-shadow: none; }
+
+/* --- Прогресс --- */
+.progress { height: 8px; border-radius: 999px; background: rgba(255, 255, 255, .08); margin: 12px 0 6px; }
+.progress > div {
+  height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, #4f8cff, #8b5cf6);
+  box-shadow: 0 0 14px rgba(79, 140, 255, .5);
+  transition: width .45s cubic-bezier(.2, .8, .2, 1);
+}
+.unit-bar { height: 9px; border-radius: 999px; background: rgba(255, 255, 255, .08); }
+.unit-bar > div {
+  border-radius: 999px; background: linear-gradient(90deg, #34d399, #4f8cff);
+  transition: width .6s cubic-bezier(.2, .8, .2, 1);
+}
+
+/* --- Задания --- */
+.prompt { font-size: 17px; font-weight: 600; line-height: 1.45; }
+.option { text-align: left; font-weight: 550; }
+.chip {
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 12px; padding: 10px 14px; font-weight: 550;
+  transition: transform .14s ease, background .2s ease;
+}
+.chip:active { transform: scale(.95); }
+.chip.used { opacity: .3; }
+.chip-row {
+  background: rgba(255, 255, 255, .035);
+  border: 1px dashed var(--line); border-radius: 16px; padding: 12px;
+}
+.kb-key {
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: 10px; font-weight: 600;
+}
+.kb-key:active { transform: scale(.92); background: var(--accent); }
+.input-field {
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid var(--line); border-radius: 14px;
+  padding: 14px; font-size: 17px;
+}
+.input-field:focus { outline: none; border-color: rgba(79, 140, 255, .7); box-shadow: 0 0 0 3px rgba(79, 140, 255, .16); }
+
+/* --- Ответы --- */
+.feedback { animation: popIn .3s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes popIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+.feedback.ok { border-color: rgba(52, 211, 153, .45); background: linear-gradient(180deg, rgba(52, 211, 153, .16), rgba(52, 211, 153, .05)); }
+.feedback.warn { border-color: rgba(251, 191, 36, .45); background: linear-gradient(180deg, rgba(251, 191, 36, .15), rgba(251, 191, 36, .04)); }
+.feedback.bad { border-color: rgba(251, 113, 133, .45); background: linear-gradient(180deg, rgba(251, 113, 133, .15), rgba(251, 113, 133, .04)); }
+.result-label { font-size: 24px; font-weight: 800; letter-spacing: -.02em; }
+.feedback.ok .result-label { color: #6ee7b7; }
+.feedback.warn .result-label { color: #fcd34d; }
+.feedback.bad .result-label { color: #fda4af; }
+
+/* вспышка на весь экран за верный/неверный ответ */
+.flash { position: fixed; inset: 0; pointer-events: none; z-index: 50; opacity: 0; }
+.flash.ok { animation: flashOk .5s ease-out; background: radial-gradient(60% 50% at 50% 45%, rgba(52, 211, 153, .45), transparent 70%); }
+.flash.warn { animation: flashOk .5s ease-out; background: radial-gradient(60% 50% at 50% 45%, rgba(251, 191, 36, .40), transparent 70%); }
+.flash.bad { animation: flashOk .5s ease-out; background: radial-gradient(60% 50% at 50% 45%, rgba(251, 113, 133, .45), transparent 70%); }
+@keyframes flashOk { 0% { opacity: .95; } 100% { opacity: 0; } }
+
+/* --- Карточки слов (3D-переворот) --- */
+.flip { perspective: 1200px; margin: 12px 0; }
+.flip-inner {
+  position: relative; min-height: 200px;
+  transform-style: preserve-3d;
+  transition: transform .6s cubic-bezier(.2, .8, .2, 1);
+}
+.flip.flipped .flip-inner { transform: rotateY(180deg); }
+.face {
+  position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 20px; text-align: center;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .04));
+  border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow);
+}
+.face.back { transform: rotateY(180deg); background: linear-gradient(160deg, rgba(79, 140, 255, .22), rgba(139, 92, 246, .12)); }
+.face .word { font-size: 30px; font-weight: 800; letter-spacing: -.03em; }
+.face .trans { font-size: 24px; font-weight: 700; color: #cfe0ff; }
+.face .hint { font-size: 12px; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+
+/* --- Табы --- */
+.tabs { gap: 6px; padding: 5px; border-radius: 16px; background: rgba(255, 255, 255, .05); border: 1px solid var(--line); }
+.tab { background: transparent; border-radius: 12px; font-weight: 600; color: var(--muted); transition: background .2s, color .2s; }
+.tab.active { background: linear-gradient(135deg, #4f8cff, #7c5cff); color: #fff; box-shadow: 0 6px 16px rgba(79, 140, 255, .3); }
+
+/* --- Результат урока --- */
+.finish-ring { position: relative; width: 160px; height: 160px; margin: 6px auto 12px; }
+.finish-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.finish-ring .val { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.finish-ring .val b { font-size: 44px; font-weight: 850; letter-spacing: -.04em; }
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 40; overflow: hidden; }
+.confetti i {
+  position: absolute; width: 9px; height: 14px; border-radius: 2px;
+  animation: fall 2.4s linear forwards;
+}
+@keyframes fall {
+  0% { transform: translateY(-12vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(540deg); opacity: .9; }
+}
+
+/* --- Столбики дней --- */
+.bar-col { height: 92px; }
+.bar {
+  width: 22px; border-radius: 8px 8px 4px 4px;
+  background: linear-gradient(180deg, #6ea2ff, #4f8cff);
+  box-shadow: 0 0 12px rgba(79, 140, 255, .35);
+  animation: growUp .5s cubic-bezier(.2, .8, .2, 1) both;
+  transform-origin: bottom;
+}
+@keyframes growUp { from { transform: scaleY(.05); opacity: .4; } to { transform: scaleY(1); opacity: 1; } }
+.bar-wrap { gap: 10px; }
+
+/* --- Список --- */
+.list-item { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.tag-row { border-bottom: 1px solid rgba(255, 255, 255, .07); }
+table.rule-table td { border-bottom: 1px solid rgba(255, 255, 255, .07); }
+.rule-table td:first-child { color: var(--muted); }
+
+/* --- Уровни --- */
+.level-card { padding: 14px; }
+.level-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: 12px; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 10px;
+}
+.level-chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.lvl {
+  border: 1px solid var(--line); background: var(--surface); color: var(--text);
+  border-radius: 14px; padding: 10px 0 8px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-size: 15px; font-weight: 750; letter-spacing: -.01em;
+  transition: transform .15s ease, background .2s ease;
+}
+.lvl span { font-size: 10px; font-weight: 500; color: var(--muted); letter-spacing: .02em; }
+.lvl:active { transform: scale(.96); }
+.lvl.active {
+  background: linear-gradient(135deg, #4f8cff, #7c5cff); border-color: transparent;
+  box-shadow: 0 8px 20px rgba(79, 140, 255, .35);
+}
+.lvl.active span { color: rgba(255, 255, 255, .78); }
+
+.tile-ico { font-size: 20px; line-height: 1; }
+.tile-title { font-size: 15px; font-weight: 650; }
+.tile-sub { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+.btn.continue { margin-top: 4px; }
+
+/* --- Юниты и уроки --- */
+.unit-card { padding: 14px; }
+.unit-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 4px; }
+.unit-num {
+  width: 34px; height: 34px; flex: 0 0 34px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800;
+  background: linear-gradient(135deg, #4f8cff, #7c5cff);
+  box-shadow: 0 6px 16px rgba(79, 140, 255, .3);
+}
+.unit-head h3 { margin: 0 0 2px; font-size: 16px; }
+.unit-head .muted { font-size: 12px; line-height: 1.35; }
+.unit-pct { margin-left: auto; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.lesson-row {
+  display: flex; gap: 10px; align-items: center; width: 100%;
+  text-align: left; background: rgba(255, 255, 255, .04);
+  border: 1px solid var(--line); border-radius: 14px;
+  padding: 11px 12px; margin-top: 8px; color: var(--text); cursor: pointer;
+  transition: transform .15s ease, background .2s ease;
+}
+.lesson-row:active { transform: scale(.99); background: var(--surface-2); }
+.lesson-row.done { border-color: rgba(52, 211, 153, .35); background: rgba(52, 211, 153, .08); }
+.lesson-ico { font-size: 15px; }
+.lesson-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lesson-main b { font-size: 14px; font-weight: 650; }
+.lesson-main .muted { font-size: 11.5px; }
+
+/* --- Слова --- */
+.word-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 4px; border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+.word-row:last-child { border-bottom: none; }
+.word-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.word-main b { font-size: 15px; font-weight: 650; overflow-wrap: anywhere; }
+.word-main span { font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.icon-btn {
+  width: 38px; height: 38px; flex: 0 0 38px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--text);
+  font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: transform .14s ease, background .2s ease;
+}
+.icon-btn:active { transform: scale(.92); }
+.icon-btn.ok { background: rgba(52, 211, 153, .16); border-color: rgba(52, 211, 153, .4); color: #6ee7b7; }
+.empty { text-align: center; padding: 26px 12px; }
+.empty .big { font-size: 34px; margin-bottom: 8px; }
+.empty p { margin: 4px 0; }
+.row-gap { display: flex; gap: 8px; margin-top: 8px; }
+.row-gap > * { flex: 1; }
+.rate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.rate-grid .btn { height: 46px; font-size: 14px; }
+textarea.input-field { resize: vertical; min-height: 96px; line-height: 1.45; }
+
+/* --- Прогон урока --- */
+.runner-head { display: flex; align-items: center; gap: 10px; margin: 4px 0 12px; }
+.runner-head .progress { flex: 1; margin: 0; }
+.runner-count { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.quit {
+  width: 34px; height: 34px; flex: 0 0 34px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--surface);
+  color: var(--muted); font-size: 14px; cursor: pointer;
+}
+.quit:active { transform: scale(.92); }
+
+/* тост */
+.toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px);
+  background: rgba(20, 28, 48, .96); border: 1px solid var(--line);
+  color: var(--text); padding: 12px 18px; border-radius: 14px; font-size: 14px;
+  box-shadow: var(--shadow); opacity: 0; transition: all .25s ease; z-index: 60; max-width: 88%;
+  text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
@@ -222,28 +577,7 @@ table.rule-table td:first-child { color: var(--tg-theme-hint-color); }
 const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
 const app = document.getElementById('app');
 
-function applyTheme() {
-  if (!tg) return;
-  const tp = tg.themeParams || {};
-  const m = {
-    bg_color: '--tg-theme-bg-color',
-    text_color: '--tg-theme-text-color',
-    secondary_bg_color: '--tg-theme-secondary-bg-color',
-    hint_color: '--tg-theme-hint-color',
-    link_color: '--tg-theme-link-color',
-    button_color: '--tg-theme-button-color',
-    button_text_color: '--tg-theme-button-text-color',
-    header_bg_color: '--tg-theme-header-bg-color',
-    section_bg_color: '--tg-theme-section-bg-color'
-  };
-  for (const k in m) {
-    if (tp[k]) document.documentElement.style.setProperty(m[k], tp[k]);
-  }
-}
-applyTheme();
-if (tg) {
-  try { tg.ready(); tg.expand(); tg.setHeaderColor('bg_color'); } catch (e) {}
-}
+// Тему Telegram не применяем: у приложения своя фиксированная тёмная палитра.
 
 let backHandler = null;
 function setBack(cb) {
@@ -258,10 +592,89 @@ function setBack(cb) {
     try { tg.BackButton.hide(); } catch (e) {}
   }
 }
-function haptic() { try { if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light'); } catch (e) {} }
-function showAlert(msg) {
-  try { if (tg && tg.showAlert) { tg.showAlert(msg); return; } } catch (e) {}
-  alert(msg);
+function haptic(kind) {
+  try {
+    if (!tg || !tg.HapticFeedback) return;
+    if (kind === 'ok') tg.HapticFeedback.notificationOccurred('success');
+    else if (kind === 'bad') tg.HapticFeedback.notificationOccurred('error');
+    else if (kind === 'warn') tg.HapticFeedback.notificationOccurred('warning');
+    else tg.HapticFeedback.impactOccurred('light');
+  } catch (e) {}
+}
+
+// Смена экрана с анимацией появления
+function render(html) {
+  app.innerHTML = html;
+  app.classList.remove('enter');
+  void app.offsetWidth;
+  app.classList.add('enter');
+  window.scrollTo(0, 0);
+}
+
+// Короткое сообщение вместо модального окна
+let toastTimer = null;
+function toast(msg) {
+  let el = document.getElementById('toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast';
+    el.className = 'toast';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  requestAnimationFrame(function () { el.classList.add('show'); });
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2200);
+}
+
+function showAlert(msg) { toast(msg); }
+
+// Вспышка на весь экран: верно / почти / ошибка
+function flash(kind) {
+  const el = document.createElement('div');
+  el.className = 'flash ' + kind;
+  document.body.appendChild(el);
+  setTimeout(function () { el.remove(); }, 520);
+}
+
+// Конфетти на финише урока
+function confetti() {
+  const box = document.createElement('div');
+  box.className = 'confetti';
+  const colors = ['#4f8cff', '#8b5cf6', '#34d399', '#fbbf24', '#fb7185', '#67e8f9'];
+  for (let i = 0; i < 42; i++) {
+    const piece = document.createElement('i');
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = colors[i % colors.length];
+    piece.style.animationDelay = (Math.random() * .5) + 's';
+    piece.style.animationDuration = (1.7 + Math.random() * 1.2) + 's';
+    piece.style.opacity = .95;
+    box.appendChild(piece);
+  }
+  document.body.appendChild(box);
+  setTimeout(function () { box.remove(); }, 3200);
+}
+
+// Круговой прогресс (SVG). Значение 0..100
+function ringSVG(percent, size, label, sub) {
+  const r = 52;
+  const c = 2 * Math.PI * r;
+  const p = Math.max(0, Math.min(100, percent || 0));
+  const off = c - (c * p) / 100;
+  return `
+    <div class="ring" style="width:${size}px;height:${size}px;flex-basis:${size}px;">
+      <svg viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4f8cff"/>
+            <stop offset="100%" stop-color="#8b5cf6"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-bg" cx="60" cy="60" r="${r}"></circle>
+        <circle class="ring-fg" cx="60" cy="60" r="${r}" style="stroke-dasharray:${c};stroke-dashoffset:${off};"></circle>
+      </svg>
+      <div class="ring-label"><b>${label}</b><span>${sub || ''}</span></div>
+    </div>`;
 }
 
 const cache = { home: null, units: null };
@@ -273,6 +686,17 @@ let vocabQueue = [];
 let vocabIndex = 0;
 let vocabMode = 'due';
 let noConnRetry = null;
+
+// Палитра приложения фиксированная (тёмная), поэтому тему Telegram не применяем:
+// со светлой темой контраст ломался бы. Заголовок окна красим в свой цвет.
+if (tg) {
+  try {
+    tg.ready();
+    tg.expand();
+    tg.setHeaderColor('#080d1a');
+    tg.setBackgroundColor('#080d1a');
+  } catch (e) {}
+}
 
 function esc(s) {
   return String(s == null ? '' : s)
@@ -312,7 +736,11 @@ async function apiFetch(path, opts) {
   });
   if (!res.ok) {
     let err = 'http_' + res.status;
-    try { const j = await res.json(); if (j && j.error) err = j.error; } catch (e) {}
+    try {
+      const j = await res.json();
+      if (j && j.message) err = j.message;
+      else if (j && j.error) err = j.error;
+    } catch (e) {}
     throw new Error(err);
   }
   const ct = res.headers.get('content-type') || '';
@@ -361,7 +789,7 @@ function screenLicense() {
     <h1>🔑 Доступ по ключу</h1>
     <p class="muted">Этот бот — платный тренажёр словацкого. Введи ключ доступа: он
     сработает один раз и привяжет доступ к твоему аккаунту навсегда.</p>
-    <input id="licenseInput" class="input-field" placeholder="SLOV-XXXXX-XXXXX-XXXXX" autocomplete="off" spellcheck="false">
+    <input id="licenseInput" class="input-field" placeholder="Ключ из 20 символов" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false">
     <button class="btn" id="licenseBtn">Активировать</button>
     <div id="licenseMsg" class="muted" style="margin-top:12px;"></div>
     <p class="muted" style="margin-top:20px;">Твой прогресс, слова и ошибки хранятся только у тебя.</p>`;
@@ -378,8 +806,13 @@ function screenLicense() {
       if (res.ok) { cache.home = null; setTimeout(function () { screenHome(); }, 900); }
     } catch (e) {
       const err = String(e && e.message || '');
-      msg.textContent = err === 'license_required' ? 'Нужен действующий ключ.' : ('Ошибка: ' + err);
-      msg.style.color = 'var(--tg-theme-text-color)';
+      if (err === 'license_required') {
+        msg.textContent = 'Нужен действующий ключ.';
+      } else if (err.indexOf('http_') === 0 || err === 'Failed to fetch') {
+        msg.textContent = 'Нет связи с сервером. Проверь интернет и попробуй ещё раз.';
+      } else {
+        msg.textContent = err;
+      }
     }
   };
   document.getElementById('licenseBtn').onclick = doIt;
@@ -398,28 +831,112 @@ async function loadUnits(force) {
   }
 }
 
+// ------------------------------------------------------------------ //
+// Общие кусочки разметки
+// ------------------------------------------------------------------ //
+let vocabTab = 'mine';
+let vocabDictLevel = '';
+let vocabQuery = '';
+let vocabBrowse = null;
+let vocabStats = { in_train: 0, due: 0, custom: 0 };
+let searchTimer = null;
+
+function statCard(label, value) {
+  return `<div class="stat"><div class="label">${esc(label)}</div><div class="value">${esc(value)}</div></div>`;
+}
+
+function tile(id, icon, title, sub) {
+  return `<button class="tile" id="${id}">
+    <span class="tile-ico">${icon}</span>
+    <span class="tile-title">${esc(title)}</span>
+    <span class="tile-sub">${esc(sub)}</span>
+  </button>`;
+}
+
+function emptyBlock(icon, title, text) {
+  return `<div class="empty"><div class="big">${icon}</div>
+    <p><b>${esc(title)}</b></p>
+    <p class="muted">${esc(text)}</p></div>`;
+}
+
+function levelChips(active, levels, attr) {
+  return (levels || []).map(function (item) {
+    const code = item.code || item;
+    const count = item.lessons != null ? item.lessons : (item.total != null ? item.total : '');
+    return `<button class="lvl ${code === active ? 'active' : ''}" data-${attr}="${esc(code)}">
+      ${esc(code)}<span>${esc(count)}</span>
+    </button>`;
+  }).join('');
+}
+
+function ask(msg, onYes) {
+  if (tg && tg.showConfirm) {
+    try { tg.showConfirm(msg, function (ok) { if (ok) onYes(); }); return; } catch (e) {}
+  }
+  if (window.confirm(msg)) onYes();
+}
+
+async function switchLevel(level, after) {
+  try {
+    await apiFetch('/api/level', { method: 'POST', body: JSON.stringify({ level: level }) });
+    cache.home = null;
+    cache.units = null;
+    haptic('ok');
+    toast('Уровень ' + level);
+    if (after) after();
+  } catch (e) {
+    toast('Не удалось сменить уровень');
+  }
+}
+
+// ------------------------------------------------------------------ //
+// Главный экран
+// ------------------------------------------------------------------ //
 async function screenHome() {
   try {
     const home = await loadHome();
     if (!home) return;
+    const levels = home.levels || [];
+    const next = home.next_lesson;
     app.innerHTML = `
-      <h1>Привет, ${esc(user.first_name)}!</h1>
-      <div class="stat-row">
-        <div class="stat"><div class="label">Уровень</div><div class="value">${esc(home.level)}</div></div>
-        <div class="stat"><div class="label">XP</div><div class="value">${esc(home.xp)}</div></div>
-        <div class="stat"><div class="label">Серия дней</div><div class="value">${esc(home.streak)}</div></div>
-        <div class="stat"><div class="label">На повторение</div><div class="value">${esc(home.words_due)}</div></div>
+      <div class="hero">
+        <div>
+          <h1>Привет, ${esc(user.first_name)}!</h1>
+          <div class="sub">Словацкий · уровень ${esc(home.level)}</div>
+        </div>
+        <div class="pill">🔥 ${esc(home.streak)}</div>
       </div>
+      <div class="stat-row">
+        ${statCard('Уровень', home.level)}
+        ${statCard('XP', home.xp)}
+        ${statCard('Серия дней', home.streak)}
+        ${statCard('На повторение', home.words_due)}
+      </div>
+      <div class="card level-card">
+        <div class="level-head"><span>Мой уровень</span><span>${esc(home.level)}</span></div>
+        <div class="level-chips">${levelChips(home.level, levels, 'homelevel')}</div>
+      </div>
+      ${next ? `<button class="btn continue" id="bContinue">▶ Продолжить · ${esc(next.title)}</button>` : ''}
       <div class="grid-btns">
-        <button class="tile" id="bLessons">📚 Уроки</button>
-        <button class="tile" id="bWords">🔤 Слова</button>
-        <button class="tile" id="bProgress">📊 Прогресс</button>
-        <button class="tile" id="bErrors">⚠️ Мои ошибки</button>
-        <button class="tile" id="bQuiz">📝 Мини-тест</button>
-        <button class="tile" id="bDrill">🎯 Тренировать ошибки</button>
+        ${tile('bLessons', '📚', 'Уроки', home.lessons_total + ' уроков')}
+        ${tile('bWords', '🔤', 'Слова', home.words_due ? home.words_due + ' на повторение' : 'карточки и словари')}
+        ${tile('bProgress', '📊', 'Прогресс', home.lessons_done + ' из ' + home.lessons_total)}
+        ${tile('bErrors', '⚠️', 'Мои ошибки', 'разбор по тегам')}
+        ${tile('bQuiz', '📝', 'Мини-тест', '10 заданий')}
+        ${tile('bDrill', '🎯', 'Тренировать ошибки', 'по твоим промахам')}
       </div>`;
+    app.querySelectorAll('[data-homelevel]').forEach(function (b) {
+      b.onclick = function () {
+        const code = b.getAttribute('data-homelevel');
+        if (code === home.level) return;
+        haptic();
+        switchLevel(code, screenHome);
+      };
+    });
+    const cont = document.getElementById('bContinue');
+    if (cont) cont.onclick = function () { haptic(); openLesson(next.id); };
     document.getElementById('bLessons').onclick = function () { haptic(); screenUnits(); };
-    document.getElementById('bWords').onclick = function () { haptic(); screenVocab('due'); };
+    document.getElementById('bWords').onclick = function () { haptic(); screenVocab('mine'); };
     document.getElementById('bProgress').onclick = function () { haptic(); screenProgress(); };
     document.getElementById('bErrors').onclick = function () { haptic(); screenErrors(); };
     document.getElementById('bQuiz').onclick = function () { haptic(); doQuiz(); };
@@ -430,26 +947,56 @@ async function screenHome() {
   }
 }
 
+// ------------------------------------------------------------------ //
+// Уроки
+// ------------------------------------------------------------------ //
 async function screenUnits() {
   try {
     const data = await loadUnits();
     const units = data.units || [];
-    let html = `<h1>Карта уроков</h1>`;
-    units.forEach(function (u) {
-      html += `<div class="card"><h2>${esc(u.n)}. ${esc(u.title)}</h2>`;
-      if (u.desc) html += `<p class="muted">${esc(u.desc)}</p>`;
-      (u.lessons || []).forEach(function (l) {
-        let icon = '▶️';
-        if (l.done) icon = '✅';
-        else if (l.locked) icon = '🔒';
-        html += `<button class="btn ${l.locked ? 'secondary' : ''}" data-lesson="${esc(l.id)}" ${l.locked ? 'disabled' : ''} style="text-align:left;">
-          ${icon} ${esc(l.id)}. ${esc(l.title)} <span class="muted">(${esc(l.tasks)} зад.)</span>
-          ${l.sub ? '<div class="muted">' + esc(l.sub) + '</div>' : ''}
+    const level = data.level || '';
+    const total = units.reduce(function (sum, u) { return sum + (u.lessons || []).length; }, 0);
+    let html = `
+      <div class="hero">
+        <div><h1>Уроки</h1><div class="sub">Уровень ${esc(level)} · ${total} уроков</div></div>
+      </div>
+      <div class="card level-card">
+        <div class="level-head"><span>Уровень</span><span>${esc(level)}</span></div>
+        <div class="level-chips">${levelChips(level, data.levels || [], 'unitlevel')}</div>
+      </div>`;
+    units.forEach(function (unit) {
+      const lessons = unit.lessons || [];
+      const done = lessons.filter(function (l) { return l.done; }).length;
+      html += `<div class="card unit-card">
+        <div class="unit-head">
+          <div class="unit-num">${esc(unit.num || unit.n)}</div>
+          <div>
+            <h3>${esc(unit.title)}</h3>
+            <div class="muted">${esc(unit.desc || '')}</div>
+          </div>
+          <div class="unit-pct">${done}/${lessons.length}</div>
+        </div>`;
+      lessons.forEach(function (lesson) {
+        html += `<button class="lesson-row ${lesson.done ? 'done' : ''}"
+          data-lesson="${esc(lesson.id)}" ${lesson.locked ? 'disabled' : ''}>
+          <span class="lesson-ico">${lesson.done ? '✅' : '▶️'}</span>
+          <span class="lesson-main">
+            <b>${esc(lesson.title)}</b>
+            <span class="muted">${lesson.sub ? esc(lesson.sub) + ' · ' : ''}${esc(lesson.tasks)} заданий</span>
+          </span>
         </button>`;
       });
       html += `</div>`;
     });
-    app.innerHTML = html;
+    render(html);
+    app.querySelectorAll('[data-unitlevel]').forEach(function (b) {
+      b.onclick = function () {
+        const code = b.getAttribute('data-unitlevel');
+        if (code === level) return;
+        haptic();
+        switchLevel(code, function () { screenUnits(); });
+      };
+    });
     app.querySelectorAll('[data-lesson]').forEach(function (b) {
       b.onclick = function () {
         haptic();
@@ -472,25 +1019,30 @@ async function openLesson(id) {
 }
 
 function screenLesson(lesson) {
-  let html = `<h1>${esc(lesson.title)}</h1>`;
-  if (lesson.sub) html += `<p class="muted">${esc(lesson.sub)}</p>`;
   const rule = lesson.rule || {};
-  if (rule.title) html += `<h2>${esc(rule.title)}</h2>`;
-  (rule.p || []).forEach(function (para) {
-    html += `<p>${esc(para)}</p>`;
-  });
-  if (rule.rows && rule.rows.length) {
-    html += `<table class="rule-table">`;
-    rule.rows.forEach(function (r) {
-      html += `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`;
-    });
-    html += `</table>`;
+  let html = `<div class="sub muted">Урок ${esc(lesson.id)}</div>
+    <h1>${esc(lesson.title)}</h1>`;
+  if (lesson.sub) html += `<p class="muted">${esc(lesson.sub)}</p>`;
+  html += `<div class="chips">
+    <span class="pill">${(lesson.tasks || []).length} заданий</span>
+    <span class="pill">выбор · набор · пары</span>
+  </div>`;
+  if (rule.title || (rule.p && rule.p.length)) {
+    html += `<div class="card">`;
+    if (rule.title) html += `<h3>${esc(rule.title)}</h3>`;
+    (rule.p || []).forEach(function (para) { html += `<p>${esc(para)}</p>`; });
+    if (rule.rows && rule.rows.length) {
+      html += `<table class="rule-table">`;
+      rule.rows.forEach(function (row) {
+        html += `<tr><td>${esc(row[0])}</td><td>${esc(row[1])}</td></tr>`;
+      });
+      html += `</table>`;
+    }
+    (rule.ex || []).forEach(function (ex) { html += `<p class="muted">• ${esc(ex)}</p>`; });
+    html += `</div>`;
   }
-  (rule.ex || []).forEach(function (ex) {
-    html += `<p class="muted">• ${esc(ex)}</p>`;
-  });
-  html += `<button class="btn" id="startBtn">Начать</button>`;
-  app.innerHTML = html;
+  html += `<button class="btn" id="startBtn">Начать урок</button>`;
+  render(html);
   document.getElementById('startBtn').onclick = function () {
     haptic();
     startRunner(lesson, 'lesson');
@@ -498,6 +1050,9 @@ function screenLesson(lesson) {
   setBack(function () { screenUnits(); });
 }
 
+// ------------------------------------------------------------------ //
+// Прогон заданий
+// ------------------------------------------------------------------ //
 function startRunner(src, kind) {
   runner = {
     title: src.title || 'Урок',
@@ -516,34 +1071,34 @@ function startRunner(src, kind) {
 
 function screenRunner() {
   if (!runner) { screenHome(); return; }
-  if (runner.idx >= runner.tasks.length) {
-    finishRunner();
-    return;
-  }
+  if (runner.idx >= runner.tasks.length) { finishRunner(); return; }
   const task = runner.tasks[runner.idx];
   const pct = Math.round((runner.idx / runner.tasks.length) * 100);
-  let html = `
-    <div class="muted">${esc(runner.title)} — задание ${runner.idx + 1} из ${runner.tasks.length}</div>
+  let html = `<div class="runner-head">
+    <button class="quit" id="quitBtn">✕</button>
     <div class="progress"><div style="width:${pct}%"></div></div>
-  `;
-  if (task.kind === 'choice') {
-    html += renderChoice(task);
-  } else if (task.kind === 'type') {
-    html += renderType(task);
-  } else if (task.kind === 'build') {
-    html += renderBuild(task);
-  } else if (task.kind === 'match') {
-    html += renderMatch(task);
-  }
-  app.innerHTML = html;
+    <div class="runner-count">${runner.idx + 1}/${runner.tasks.length}</div>
+  </div>`;
+  if (task.kind === 'choice') html += renderChoice(task);
+  else if (task.kind === 'type') html += renderType(task);
+  else if (task.kind === 'build') html += renderBuild(task);
+  else if (task.kind === 'match') html += renderMatch(task);
+  render(html);
   attachTaskHandlers(task);
+  document.getElementById('quitBtn').onclick = function () {
+    haptic();
+    ask('Выйти из урока? Текущий прогон не сохранится.', function () {
+      runner = null;
+      screenHome();
+    });
+  };
   setBack(function () { screenHome(); });
 }
 
 function renderChoice(task) {
   let html = `<div class="card"><div class="prompt">${esc(task.prompt)}</div></div>`;
   (task.options || []).forEach(function (opt, i) {
-    html += `<button class="btn option" data-choice="${i}">${esc(opt)}</button>`;
+    html += `<button class="btn secondary option" data-choice="${i}">${esc(opt)}</button>`;
   });
   return html;
 }
@@ -553,8 +1108,8 @@ let SK_LETTERS = 'á ä č ď é í ĺ ľ ň ó ô ŕ š ť ú ý ž'.split(' ')
 function renderType(task) {
   typeBuffer = '';
   let html = `<div class="card"><div class="prompt">${esc(task.prompt)}</div>`;
-  html += `<div class="muted" style="margin:6px 0;">${esc(task.sk)}</div>`;
-  html += `<input class="input-field" id="typeInput" type="text" value="" autocomplete="off" />`;
+  if (task.sk) html += `<div class="muted" style="margin:6px 0;">${esc(task.sk)}</div>`;
+  html += `<input class="input-field" id="typeInput" type="text" value="" autocomplete="off" autocapitalize="off" spellcheck="false" />`;
   html += `</div>`;
   html += `<div class="kb-grid">`;
   SK_LETTERS.forEach(function (ch) {
@@ -563,8 +1118,8 @@ function renderType(task) {
   html += `<button class="kb-key" data-letter=" ">␣</button>`;
   html += `<button class="kb-key" data-letter="__back__">⌫</button>`;
   html += `</div>`;
-  html += `<button class="btn" id="typeCheck">✅ Проверить</button>`;
-  html += `<button class="btn secondary" id="typeClear">↩️ Очистить</button>`;
+  html += `<button class="btn" id="typeCheck">Проверить</button>`;
+  html += `<button class="btn ghost" id="typeClear">Очистить</button>`;
   return html;
 }
 
@@ -577,8 +1132,8 @@ function renderBuild(task) {
     html += `<span class="chip" data-build="${i}">${esc(w)}</span>`;
   });
   html += `</div>`;
-  html += `<button class="btn" id="buildCheck">✅ Проверить</button>`;
-  html += `<button class="btn secondary" id="buildClear">↩️ Очистить</button>`;
+  html += `<button class="btn" id="buildCheck">Проверить</button>`;
+  html += `<button class="btn ghost" id="buildClear">Очистить</button>`;
   return html;
 }
 
@@ -599,11 +1154,11 @@ function matchHTML(task) {
   const left = pair[0];
   const rights = m.pairs.map(function (p) { return p[1]; });
   const opts = rights.slice().sort(function () { return Math.random() - 0.5; });
-  let html = `<div class="card"><div class="prompt">${esc(task.prompt)}</div>`;
-  html += `<p>Пара ${m.current + 1} из ${m.pairs.length}</p>`;
-  html += `<p><b>Что значит «${esc(left)}»?</b></p></div>`;
+  let html = `<div class="card"><div class="prompt">${esc(task.prompt)}</div>
+    <p class="muted">Пара ${m.current + 1} из ${m.pairs.length}</p>
+    <p><b>Что значит «${esc(left)}»?</b></p></div>`;
   opts.forEach(function (opt) {
-    html += `<button class="btn option" data-matchopt="${esc(opt)}" data-matchleft="${esc(left)}">${esc(opt)}</button>`;
+    html += `<button class="btn secondary option" data-matchopt="${esc(opt)}" data-matchleft="${esc(left)}">${esc(opt)}</button>`;
   });
   html += `<div id="matchFeedback" style="margin-top:10px;"></div>`;
   return html;
@@ -628,11 +1183,8 @@ function attachTaskHandlers(task) {
       b.onclick = function () {
         haptic();
         const ch = b.getAttribute('data-letter');
-        if (ch === '__back__') {
-          typeBuffer = typeBuffer.slice(0, -1);
-        } else {
-          typeBuffer += ch;
-        }
+        if (ch === '__back__') typeBuffer = typeBuffer.slice(0, -1);
+        else typeBuffer += ch;
         const inp = document.getElementById('typeInput');
         if (inp) inp.value = typeBuffer;
       };
@@ -656,8 +1208,6 @@ function attachTaskHandlers(task) {
       b.onclick = function () {
         haptic();
         const i = parseInt(b.getAttribute('data-build'), 10);
-        const w = (task.words || [])[i];
-        if (w == null) return;
         if (currentBuild.indexOf(i) !== -1) return;
         currentBuild.push(i);
         b.classList.add('used');
@@ -689,7 +1239,7 @@ function renderBuildRow(task) {
   if (!row) return;
   row.innerHTML = currentBuild.map(function (i) {
     return `<span class="chip">${esc((task.words || [])[i])}</span>`;
-  }).join('') || '<span class="muted">Нажимайте слова ниже</span>';
+  }).join('') || '<span class="muted">Нажимай слова ниже</span>';
 }
 
 function attachMatchHandlers(task) {
@@ -703,26 +1253,23 @@ function attachMatchHandlers(task) {
       const right = pair[1];
       const ok = (opt === right);
       m.chosen[left] = opt;
-      // disable options
       app.querySelectorAll('[data-matchopt]').forEach(function (x) { x.disabled = true; });
-      b.style.background = ok ? '#4caf50' : '#e53935';
+      b.style.background = ok ? 'rgba(52,211,153,.25)' : 'rgba(251,113,133,.25)';
+      b.style.borderColor = ok ? 'rgba(52,211,153,.5)' : 'rgba(251,113,133,.5)';
+      flash(ok ? 'ok' : 'bad');
+      haptic(ok ? 'ok' : 'bad');
       const fb = document.getElementById('matchFeedback');
       if (fb) {
-        fb.innerHTML = ok
-          ? `<p style="color:#4caf50;font-weight:600;">Верно</p>`
-          : `<p style="color:#e53935;font-weight:600;">Неверно. Правильно: ${esc(right)}</p>`
-          + `<button class="btn" id="matchNext">➡️ Дальше</button>`;
+        fb.innerHTML = (ok
+          ? `<p style="color:#6ee7b7;font-weight:650;margin:0 0 8px;">Верно</p>`
+          : `<p style="color:#fda4af;font-weight:650;margin:0 0 8px;">Неверно. Правильно: ${esc(right)}</p>`)
+          + `<button class="btn" id="matchNext">Дальше →</button>`;
         const nb = document.getElementById('matchNext');
         if (nb) nb.onclick = function () {
           haptic();
           m.current += 1;
-          if (m.current >= m.pairs.length) {
-            submitMatch(task);
-          } else {
-            const area = document.getElementById('app');
-            // re-render match task
-            screenRunner();
-          }
+          if (m.current >= m.pairs.length) submitMatch(task);
+          else screenRunner();
         };
       }
     };
@@ -730,8 +1277,7 @@ function attachMatchHandlers(task) {
 }
 
 async function submitMatch(task) {
-  const mapping = runner.match.chosen;
-  await submitAnswer(task, { kind: 'match', value: mapping });
+  await submitAnswer(task, { kind: 'match', value: runner.match.chosen });
 }
 
 async function submitAnswer(task, answerValue) {
@@ -742,51 +1288,45 @@ async function submitAnswer(task, answerValue) {
     });
     showFeedback(task, res);
   } catch (e) {
-    if (e.message === 'stale') {
-      showAlert('Задание уже проверено. Нажмите «Дальше».');
-    } else {
-      showNoConn(function () { submitAnswer(task, answerValue); });
-    }
+    if (e.message === 'stale') toast('Задание уже проверено. Нажми «Дальше».');
+    else showNoConn(function () { submitAnswer(task, answerValue); });
   }
 }
 
 function showFeedback(task, res) {
   const cls = res.result === 'ok' ? 'ok' : (res.result === 'typo' || res.result === 'accents' ? 'warn' : 'bad');
+  flash(cls);
+  haptic(cls);
   let html = `<div class="card feedback ${cls}">
     <div class="result-label">${esc(res.result_ru)}</div>
-    <div>Ваш ответ: <code>${esc(res.given)}</code></div>
+    <div class="muted" style="margin:4px 0;">Твой ответ: <code>${esc(res.given || '—')}</code></div>
     <div>Правильно: <b>${esc(res.expected)}</b></div>`;
   if (res.explanation) html += `<div class="muted" style="margin-top:6px;">${esc(res.explanation)}</div>`;
   if (res.result === 'accents' && res.missing_accents && res.missing_accents.length) {
     html += `<div style="margin-top:6px;">Потерянные диакритики: <b>${res.missing_accents.map(esc).join(' ')}</b></div>`;
   }
-  html += `
-    <button class="btn ghost" id="speakBtn" style="margin-top:8px;">🔊 Озвучить</button>
-    <button class="btn" id="nextBtn">➡️ Дальше</button>
-    <button class="btn secondary" id="retryBtn">🔁 Ещё раз</button>
+  html += `<div class="row-gap" style="margin-top:12px;">
+      <button class="btn ghost" id="speakBtn">🔊</button>
+      <button class="btn secondary" id="retryBtn">🔁 Ещё</button>
+    </div>
+    <button class="btn" id="nextBtn">Дальше →</button>
   </div>`;
-  app.innerHTML = html;
-  const speakBtn = document.getElementById('speakBtn');
-  if (speakBtn) speakBtn.onclick = function () { haptic(); playSpeech(res.expected || res.given); };
-  const nextBtn = document.getElementById('nextBtn');
-  if (nextBtn) nextBtn.onclick = function () {
+  render(html);
+  document.getElementById('speakBtn').onclick = function () { haptic(); playSpeech(res.expected || res.given); };
+  document.getElementById('nextBtn').onclick = function () {
     haptic();
     runner.idx += 1;
     if (runner.idx >= runner.tasks.length) finishRunner();
     else screenRunner();
   };
-  const retryBtn = document.getElementById('retryBtn');
-  if (retryBtn) retryBtn.onclick = function () {
-    haptic();
-    // повторить текущее задание
-    screenRunner();
-  };
+  document.getElementById('retryBtn').onclick = function () { haptic(); screenRunner(); };
 }
 
 async function playSpeech(text) {
   if (!text) return;
   try {
-    const res = await fetch('/api/speech?text=' + encodeURIComponent(text), {
+    await loadConfig();
+    const res = await fetch(API_BASE + '/api/speech?text=' + encodeURIComponent(text), {
       headers: { 'X-Telegram-Init-Data': (tg && tg.initData) || '' }
     });
     if (!res.ok) throw new Error('no_tts');
@@ -795,7 +1335,7 @@ async function playSpeech(text) {
     const audio = new Audio(url);
     audio.play();
   } catch (e) {
-    showAlert('Озвучка недоступна');
+    toast('Озвучка недоступна');
   }
 }
 
@@ -805,154 +1345,438 @@ async function finishRunner() {
     const res = await apiFetch('/api/lesson/' + encodeURIComponent(lessonId) + '/finish', { method: 'POST' });
     cache.home = null;
     cache.units = null;
-    let html = `<h1>Итог</h1>`;
-    html += `<div class="card"><div class="result-label">${esc(res.percent)}%</div>`;
-    html += `<p>Верно: ${esc(res.correct)} из ${esc(res.total)}</p>`;
-    if (res.xp) html += `<p>XP: +${esc(res.xp)}</p>`;
-    html += `<p>Серия: ${esc(res.streak)} дней</p></div>`;
+    const pct = res.percent || 0;
+    if (pct >= 80) confetti();
+    const dash = 326.7;
+    const offset = dash - (dash * pct) / 100;
+    let html = `<div class="center" style="padding:6px 0 0;">
+      <h1 style="margin:0;">${pct >= 80 ? 'Отлично! 🎉' : 'Урок пройден'}</h1>
+      <p class="muted">${esc(runner.title)}</p>
+    </div>
+    <div class="finish-ring">
+      <svg viewBox="0 0 120 120">
+        <defs><linearGradient id="finishGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#4f8cff"/><stop offset="100%" stop-color="#8b5cf6"/>
+        </linearGradient></defs>
+        <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+        <circle class="ring-fg" cx="60" cy="60" r="52"
+          style="stroke:url(#finishGrad);stroke-dasharray:${dash};stroke-dashoffset:${offset};"></circle>
+      </svg>
+      <div class="val"><b>${esc(pct)}%</b><span class="muted">верно</span></div>
+    </div>
+    <div class="stat-row">
+      ${statCard('Верно', res.correct + ' из ' + res.total)}
+      ${statCard('XP', '+' + (res.xp || 0))}
+      ${statCard('Серия', res.streak + ' дн.')}
+      ${statCard('Ошибки', (res.mistakes || []).length)}
+    </div>`;
     if (res.mistakes && res.mistakes.length) {
-      html += `<div class="card"><h3>Ошибки</h3>`;
+      html += `<div class="card"><h3>Разбор ошибок</h3>`;
       res.mistakes.forEach(function (m) {
-        html += `<div class="mistake">❌ ${esc(m.given)} → ✅ ${esc(m.expected)} <span class="muted">(${esc(m.tag)})</span></div>`;
+        html += `<div class="word-row">
+          <div class="word-main"><b>${esc(m.expected)}</b><span>ты: ${esc(m.given || '—')}</span></div>
+          <span class="muted">${esc(m.tag)}</span>
+        </div>`;
       });
       html += `</div>`;
     }
     if (res.next_lesson) {
-      html += `<button class="btn" id="nextLessonBtn">Следующий урок</button>`;
+      html += `<button class="btn" id="nextLessonBtn">Следующий урок · ${esc(res.next_lesson.title)}</button>`;
     }
     html += `<button class="btn secondary" id="homeBtn">На главную</button>`;
-    app.innerHTML = html;
+    render(html);
     const nl = document.getElementById('nextLessonBtn');
-    if (nl) nl.onclick = async function () {
+    if (nl) nl.onclick = function () {
       haptic();
-      try {
-        const lesson = await apiFetch('/api/lesson/' + encodeURIComponent(res.next_lesson.id));
-        screenLesson(lesson);
-      } catch (e) { showNoConn(function () { }); }
+      openLesson(res.next_lesson.id);
     };
-    const hb = document.getElementById('homeBtn');
-    if (hb) hb.onclick = function () { haptic(); screenHome(); };
+    document.getElementById('homeBtn').onclick = function () { haptic(); screenHome(); };
     setBack(function () { screenHome(); });
   } catch (e) {
     showNoConn(function () { finishRunner(); });
   }
 }
 
-async function screenVocab(mode) {
-  vocabMode = mode || vocabMode;
-  try {
-    const path = vocabMode === 'due' ? '/api/vocab/due?count=20' : '/api/vocab/new?count=10';
-    const data = await apiFetch(path);
-    vocabQueue = data.cards || [];
-    vocabIndex = 0;
-    renderVocabTabs();
-    if (vocabQueue.length === 0) {
-      // Важно: не app.innerHTML += ... — это пересоздаёт кнопки вкладок
-      // и стирает их обработчики. Пишем внутрь контейнера.
-      const area = document.getElementById('vocabArea');
-      if (area) area.innerHTML = `<div class="center"><p class="muted">Карточек нет.</p></div>`;
-      return;
-    }
-    renderVocabCard();
-  } catch (e) {
-    showNoConn(function () { screenVocab(vocabMode); });
-  }
-}
-
-function renderVocabTabs() {
+// ------------------------------------------------------------------ //
+// Слова: мои карточки / словари / тренировка
+// ------------------------------------------------------------------ //
+async function screenVocab(tab) {
+  vocabTab = tab || vocabTab || 'mine';
   app.innerHTML = `
-    <h1>Слова</h1>
+    <div class="hero">
+      <div><h1>Слова</h1><div class="sub">карточки, словари и повторение</div></div>
+      <div class="pill" id="vocabPill">0</div>
+    </div>
     <div class="tabs">
-      <button class="tab ${vocabMode === 'due' ? 'active' : ''}" id="tabDue">На повторение</button>
-      <button class="tab ${vocabMode === 'new' ? 'active' : ''}" id="tabNew">Новые</button>
+      <button class="tab ${vocabTab === 'mine' ? 'active' : ''}" id="vTabMine">Мои</button>
+      <button class="tab ${vocabTab === 'dict' ? 'active' : ''}" id="vTabDict">Словари</button>
+      <button class="tab ${vocabTab === 'train' ? 'active' : ''}" id="vTabTrain">Тренировка</button>
     </div>
     <div id="vocabArea"></div>`;
-  document.getElementById('tabDue').onclick = function () { haptic(); screenVocab('due'); };
-  document.getElementById('tabNew').onclick = function () { haptic(); screenVocab('new'); };
+  document.getElementById('vTabMine').onclick = function () { haptic(); screenVocab('mine'); };
+  document.getElementById('vTabDict').onclick = function () { haptic(); screenVocab('dict'); };
+  document.getElementById('vTabTrain').onclick = function () { haptic(); screenVocab('train'); };
+  setBack(function () { screenHome(); });
+  updateVocabPill();
+  if (vocabTab === 'mine') await vocabMineTab();
+  else if (vocabTab === 'dict') await vocabDictTab();
+  else await vocabTrainTab(vocabMode || 'due');
 }
 
-function renderVocabCard() {
+function updateVocabPill() {
+  const pill = document.getElementById('vocabPill');
+  if (pill) pill.textContent = '🔁 ' + (vocabStats.due || 0);
+}
+
+function vocabStatsLine() {
+  return `<div class="chips" style="justify-content:center;">
+    <span class="pill">В тренировке <b>${vocabStats.in_train || 0}</b></span>
+    <span class="pill">На повторение <b>${vocabStats.due || 0}</b></span>
+  </div>`;
+}
+
+async function vocabMineTab() {
   const area = document.getElementById('vocabArea');
   if (!area) return;
-  const card = vocabQueue[vocabIndex];
-  if (!card) {
-    area.innerHTML = `<div class="center"><p>Готово! 🎉</p><button class="btn" id="vocabHome">На главную</button></div>`;
-    const b = document.getElementById('vocabHome');
-    if (b) b.onclick = function () { screenHome(); };
+  let data;
+  try {
+    data = await apiFetch('/api/vocab/mine');
+  } catch (e) {
+    area.innerHTML = `<div class="center"><p class="muted">Нет связи.</p>
+      <button class="btn" id="mineRetry">Повторить</button></div>`;
+    const b = document.getElementById('mineRetry');
+    if (b) b.onclick = vocabMineTab;
     return;
   }
+  vocabStats = data.stats || vocabStats;
+  updateVocabPill();
+  const cards = data.cards || [];
+  let rows = '';
+  cards.forEach(function (card, index) {
+    rows += `<div class="word-row">
+      <div class="word-main"><b>${esc(card.sk)}</b><span>${esc(card.ru)}</span></div>
+      <button class="icon-btn" data-say="${index}">🔊</button>
+      <button class="icon-btn" data-del="${index}">✕</button>
+    </div>`;
+  });
   area.innerHTML = `
     <div class="card">
-      <div style="font-size:24px;font-weight:700;margin-bottom:8px;">${esc(card.sk)}</div>
-      <button class="btn ghost" id="vocabSpeak" style="width:auto;display:inline-block;">🔊</button>
-      <div id="vocabTrans" style="display:none;margin:8px 0;font-size:18px;">${esc(card.ru)}</div>
-      <button class="btn secondary" id="vocabShow">👁 Показать перевод</button>
-      <div id="vocabRating" style="display:none;margin-top:10px;">
-        <button class="btn danger" data-q="0">😵 Не знаю</button>
-        <button class="btn secondary" data-q="1">🤔 С трудом</button>
-        <button class="btn secondary" data-q="2">🙂 Нормально</button>
-        <button class="btn" data-q="3">😃 Легко</button>
+      <h3 style="margin-top:0;">Новая карточка</h3>
+      <input id="newSk" class="input-field" placeholder="Slovenské slovo" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <input id="newRu" class="input-field" placeholder="Перевод на русский" autocomplete="off">
+      <button class="btn" id="addCard">Добавить карточку</button>
+      <button class="btn ghost" id="toggleBulk">Вставить списком</button>
+      <div id="bulkBox" style="display:none;">
+        <textarea id="bulkText" class="input-field" placeholder="slovo — перевод&#10;ďalšie slovo — ещё одно"></textarea>
+        <button class="btn secondary" id="addBulk">Добавить всё</button>
       </div>
     </div>
-    <div class="muted">Карточка ${vocabIndex + 1} из ${vocabQueue.length}</div>`;
-  const speak = document.getElementById('vocabSpeak');
-  if (speak) speak.onclick = function () { haptic(); playSpeech(card.sk); };
-  const show = document.getElementById('vocabShow');
-  if (show) show.onclick = function () {
+    <div class="card">
+      <div class="level-head"><span>Мои карточки</span><span>${cards.length}</span></div>
+      ${rows || emptyBlock('📝', 'Пока пусто', 'Добавь слово сверху — оно сразу попадёт в тренировку.')}
+    </div>
+    ${vocabStatsLine()}`;
+
+  function reload() { vocabMineTab(); }
+  document.getElementById('addCard').onclick = async function () {
     haptic();
-    const t = document.getElementById('vocabTrans');
-    if (t) t.style.display = 'block';
-    const r = document.getElementById('vocabRating');
-    if (r) r.style.display = 'block';
-    show.style.display = 'none';
+    const sk = (document.getElementById('newSk').value || '').trim();
+    const ru = (document.getElementById('newRu').value || '').trim();
+    if (!sk || !ru) { toast('Нужны слово и перевод'); return; }
+    try {
+      await apiFetch('/api/vocab/custom', { method: 'POST', body: JSON.stringify({ sk: sk, ru: ru }) });
+      toast('Добавлено: ' + sk);
+      reload();
+    } catch (e) { toast('Не получилось добавить'); }
   };
-  area.querySelectorAll('[data-q]').forEach(function (b) {
+  document.getElementById('toggleBulk').onclick = function () {
+    const box = document.getElementById('bulkBox');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  };
+  document.getElementById('addBulk').onclick = async function () {
+    haptic();
+    const text = document.getElementById('bulkText').value || '';
+    if (!text.trim()) { toast('Вставь список'); return; }
+    try {
+      const res = await apiFetch('/api/vocab/custom/bulk', { method: 'POST', body: JSON.stringify({ text: text }) });
+      toast('Добавлено: ' + res.added + (res.skipped ? ' · пропущено: ' + res.skipped : ''));
+      reload();
+    } catch (e) { toast('Не получилось добавить'); }
+  };
+  area.querySelectorAll('[data-say]').forEach(function (b) {
+    b.onclick = function () {
+      const card = cards[parseInt(b.getAttribute('data-say'), 10)];
+      if (card) playSpeech(card.sk);
+    };
+  });
+  area.querySelectorAll('[data-del]').forEach(function (b) {
+    b.onclick = function () {
+      const card = cards[parseInt(b.getAttribute('data-del'), 10)];
+      if (!card) return;
+      haptic();
+      ask('Удалить карточку «' + card.sk + '»?', async function () {
+        try {
+          await apiFetch('/api/vocab/custom/' + card.id, { method: 'DELETE' });
+          toast('Удалено');
+          reload();
+        } catch (e) { toast('Не получилось удалить'); }
+      });
+    };
+  });
+}
+
+async function vocabDictTab() {
+  const area = document.getElementById('vocabArea');
+  if (!area) return;
+  const params = new URLSearchParams();
+  if (vocabDictLevel) params.set('level', vocabDictLevel);
+  let data;
+  try {
+    data = await apiFetch('/api/vocab/browse?' + params.toString());
+  } catch (e) {
+    area.innerHTML = `<div class="center"><p class="muted">Нет связи.</p>
+      <button class="btn" id="dictRetry">Повторить</button></div>`;
+    const b = document.getElementById('dictRetry');
+    if (b) b.onclick = vocabDictTab;
+    return;
+  }
+  vocabBrowse = data;
+  vocabDictLevel = data.level;
+  vocabStats = data.stats || vocabStats;
+  updateVocabPill();
+  const info = (data.levels || []).filter(function (l) { return l.code === data.level; })[0] || {};
+  area.innerHTML = `
+    <div class="card level-card">
+      <div class="level-head"><span>Словарь</span><span>${info.enrolled || 0} / ${info.total || 0}</span></div>
+      <div class="level-chips">${levelChips(data.level, data.levels || [], 'dictlevel')}</div>
+    </div>
+    <input id="dictSearch" class="input-field" placeholder="Поиск: словацкое или русское" value="${esc(vocabQuery)}" autocomplete="off">
+    <button class="btn secondary" id="addAll">Добавить весь уровень ${esc(data.level)}</button>
+    <div class="card" id="dictList" style="margin-top:12px;"></div>
+    ${vocabStatsLine()}`;
+  app.querySelectorAll('[data-dictlevel]').forEach(function (b) {
+    b.onclick = function () {
+      const code = b.getAttribute('data-dictlevel');
+      if (code === vocabDictLevel) return;
+      haptic();
+      vocabDictLevel = code;
+      vocabQuery = '';
+      vocabDictTab();
+    };
+  });
+  const search = document.getElementById('dictSearch');
+  search.addEventListener('input', function () {
+    vocabQuery = search.value || '';
+    // Сначала фильтруем уже загруженный список — это мгновенно,
+    // потом спрашиваем сервер, чтобы находились слова за пределами первой порции.
+    renderDictList();
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(async function () {
+      if (vocabQuery !== (search.value || '')) return;
+      try {
+        const q = new URLSearchParams({ level: vocabDictLevel });
+        if (vocabQuery) q.set('q', vocabQuery);
+        vocabBrowse = await apiFetch('/api/vocab/browse?' + q.toString());
+        renderDictList();
+      } catch (e) { /* оставляем локальную фильтрацию */ }
+    }, 260);
+  });
+  document.getElementById('addAll').onclick = function () {
+    haptic();
+    ask('Добавить все слова уровня ' + vocabDictLevel + ' в тренировку?', async function () {
+      try {
+        const res = await apiFetch('/api/vocab/add', {
+          method: 'POST',
+          body: JSON.stringify({ all: true, level: vocabDictLevel })
+        });
+        toast('Добавлено: ' + res.added);
+        vocabDictTab();
+      } catch (e) { toast('Не получилось добавить'); }
+    });
+  };
+  renderDictList();
+}
+
+function renderDictList() {
+  const list = document.getElementById('dictList');
+  if (!list || !vocabBrowse) return;
+  const q = (vocabQuery || '').toLowerCase();
+  const cards = (vocabBrowse.cards || []).filter(function (c) {
+    return !q || String(c.sk).toLowerCase().indexOf(q) !== -1 || String(c.ru).toLowerCase().indexOf(q) !== -1;
+  });
+  if (!cards.length) {
+    list.innerHTML = emptyBlock('🔎', 'Ничего не найдено', 'Попробуй другое слово.');
+    return;
+  }
+  let html = `<div class="level-head"><span>${vocabQuery ? 'Найдено' : 'Слова'}</span><span>${cards.length}</span></div>`;
+  cards.forEach(function (card, index) {
+    html += `<div class="word-row">
+      <div class="word-main"><b>${esc(card.sk)}</b><span>${esc(card.ru)}</span></div>
+      <button class="icon-btn" data-dsay="${index}">🔊</button>
+      <button class="icon-btn ${card.added ? 'ok' : ''}" data-dadd="${index}" ${card.added ? 'disabled' : ''}>${card.added ? '✓' : '＋'}</button>
+    </div>`;
+  });
+  list.innerHTML = html;
+  list.querySelectorAll('[data-dsay]').forEach(function (b) {
+    b.onclick = function () {
+      const card = cards[parseInt(b.getAttribute('data-dsay'), 10)];
+      if (card) playSpeech(card.sk);
+    };
+  });
+  list.querySelectorAll('[data-dadd]').forEach(function (b) {
     b.onclick = async function () {
       haptic();
-      const q = parseInt(b.getAttribute('data-q'), 10);
+      const card = cards[parseInt(b.getAttribute('data-dadd'), 10)];
+      if (!card) return;
       try {
-        const res = await apiFetch('/api/vocab/rate', {
+        await apiFetch('/api/vocab/add', { method: 'POST', body: JSON.stringify({ ids: [card.id] }) });
+        card.added = true;
+        vocabStats.in_train = (vocabStats.in_train || 0) + 1;
+        updateVocabPill();
+        renderDictList();
+        toast('Добавлено: ' + card.sk);
+      } catch (e) { toast('Не получилось добавить'); }
+    };
+  });
+}
+
+async function vocabTrainTab(mode) {
+  vocabMode = mode || 'due';
+  const area = document.getElementById('vocabArea');
+  if (!area) return;
+  const path = vocabMode === 'due' ? '/api/vocab/due?count=20' : '/api/vocab/new?count=10';
+  let data;
+  try {
+    data = await apiFetch(path);
+  } catch (e) {
+    area.innerHTML = `<div class="center"><p class="muted">Нет связи.</p>
+      <button class="btn" id="trainRetry">Повторить</button></div>`;
+    const b = document.getElementById('trainRetry');
+    if (b) b.onclick = function () { vocabTrainTab(vocabMode); };
+    return;
+  }
+  vocabQueue = data.cards || [];
+  vocabIndex = 0;
+  area.innerHTML = `
+    <div class="tabs" style="margin-top:0;">
+      <button class="tab ${vocabMode === 'due' ? 'active' : ''}" id="trDue">На повторение</button>
+      <button class="tab ${vocabMode === 'new' ? 'active' : ''}" id="trNew">Новые</button>
+    </div>
+    <div id="trainCard"></div>`;
+  document.getElementById('trDue').onclick = function () { haptic(); vocabTrainTab('due'); };
+  document.getElementById('trNew').onclick = function () { haptic(); vocabTrainTab('new'); };
+  if (!vocabQueue.length) {
+    document.getElementById('trainCard').innerHTML = vocabMode === 'due'
+      ? emptyBlock('🎉', 'На сегодня всё', 'Повторений нет. Загляни в «Словари», чтобы взять новые слова.')
+      : emptyBlock('📚', 'Новых слов нет', 'Все слова уровня уже в тренировке.');
+    return;
+  }
+  renderTrainCard();
+}
+
+function renderTrainCard() {
+  const box = document.getElementById('trainCard');
+  if (!box) return;
+  const card = vocabQueue[vocabIndex];
+  if (!card) {
+    box.innerHTML = emptyBlock('🎉', 'Готово!', 'Карточки на сегодня закончились.');
+    return;
+  }
+  box.innerHTML = `
+    <div class="flip" id="flipCard">
+      <div class="flip-inner">
+        <div class="face">
+          <div class="hint">слово</div>
+          <div class="word">${esc(card.sk)}</div>
+          <div class="hint">нажми, чтобы перевернуть</div>
+        </div>
+        <div class="face back">
+          <div class="hint">перевод</div>
+          <div class="trans">${esc(card.ru)}</div>
+        </div>
+      </div>
+    </div>
+    <div class="row-gap">
+      <button class="btn ghost" id="trSpeak">🔊 Послушать</button>
+      <button class="btn secondary" id="trFlip">Перевернуть</button>
+    </div>
+    <div class="rate-grid" id="rateGrid" style="display:none;">
+      <button class="btn danger" data-q="0">😵 Не знаю</button>
+      <button class="btn secondary" data-q="1">🤔 С трудом</button>
+      <button class="btn secondary" data-q="2">🙂 Нормально</button>
+      <button class="btn" data-q="3">😃 Легко</button>
+    </div>
+    <div class="muted" style="text-align:center;margin-top:12px;">
+      ${vocabIndex + 1} из ${vocabQueue.length}${card.group ? ' · ' + esc(card.group) : ''}
+    </div>`;
+
+  const flip = document.getElementById('flipCard');
+  const grid = document.getElementById('rateGrid');
+  function doFlip() {
+    flip.classList.toggle('flipped');
+    if (flip.classList.contains('flipped')) grid.style.display = 'grid';
+  }
+  flip.onclick = function () { haptic(); doFlip(); };
+  document.getElementById('trFlip').onclick = function () { haptic(); doFlip(); };
+  document.getElementById('trSpeak').onclick = function () { haptic(); playSpeech(card.sk); };
+  box.querySelectorAll('[data-q]').forEach(function (b) {
+    b.onclick = async function () {
+      haptic();
+      const quality = parseInt(b.getAttribute('data-q'), 10);
+      try {
+        await apiFetch('/api/vocab/rate', {
           method: 'POST',
-          body: JSON.stringify({ vocab_id: card.id, quality: q })
+          body: JSON.stringify({ vocab_id: card.id, quality: quality })
         });
         cache.home = null;
         vocabIndex += 1;
-        renderVocabCard();
+        renderTrainCard();
       } catch (e) {
-        showNoConn(function () { screenVocab(vocabMode); });
+        toast('Не получилось сохранить');
       }
     };
   });
-  setBack(function () { screenHome(); });
 }
 
+// ------------------------------------------------------------------ //
+// Прогресс
+// ------------------------------------------------------------------ //
 async function screenProgress() {
   try {
     const p = await apiFetch('/api/progress');
+    const pct = p.lessons_total ? Math.round((p.lessons_done / p.lessons_total) * 100) : 0;
     const maxDay = Math.max.apply(null, (p.days || []).map(function (d) { return d.xp || 0; }).concat([1]));
-    let html = `<h1>Прогресс</h1>`;
-    html += `<div class="stat-row">
-      <div class="stat"><div class="label">XP</div><div class="value">${esc(p.xp)}</div></div>
-      <div class="stat"><div class="label">Серия</div><div class="value">${esc(p.streak)}</div></div>
-      <div class="stat"><div class="label">Рекорд</div><div class="value">${esc(p.best_streak)}</div></div>
-      <div class="stat"><div class="label">Точность</div><div class="value">${esc(p.accuracy)}%</div></div>
+    let html = `<div class="hero"><div><h1>Прогресс</h1>
+      <div class="sub">уровень ${esc(p.level || '')}</div></div>
+      <div class="pill">${esc(pct)}%</div></div>`;
+    html += `<div class="card ring-card">
+      ${ringSVG(pct, 118, pct + '%', 'уроки')}
+      <div class="ring-side">
+        <div class="big">${esc(p.lessons_done)} из ${esc(p.lessons_total)} уроков</div>
+        <div class="muted" style="margin-top:4px;">Заданий решено: ${esc(p.tasks_done)} · точность ${esc(p.accuracy)}%</div>
+        <div class="muted" style="margin-top:4px;">Слов выучено: ${esc(p.words_learned)}</div>
+      </div>
     </div>`;
-    html += `<div class="card">
-      <p>Уроки: ${esc(p.lessons_done)} / ${esc(p.lessons_total)}</p>
-      <p>Задания: ${esc(p.tasks_done)}</p>
-      <p>Слова выучено: ${esc(p.words_learned)} · на повторение: ${esc(p.words_due)}</p>
+    html += `<div class="stat-row">
+      ${statCard('XP', p.xp)}
+      ${statCard('Серия', p.streak)}
+      ${statCard('Рекорд', p.best_streak)}
+      ${statCard('На повторение', p.words_due)}
     </div>`;
     html += `<div class="card"><h3>Последние 7 дней</h3><div class="bar-wrap">`;
     (p.days || []).forEach(function (d) {
       const h = Math.round(((d.xp || 0) / maxDay) * 70) + 2;
-      html += `<div class="bar-col"><div class="bar" style="height:${h}px"></div><div class="muted" style="font-size:10px;">${esc((d.day || '').slice(5))}</div></div>`;
+      html += `<div class="bar-col"><div class="bar" style="height:${h}px"></div>
+        <div class="muted" style="font-size:10px;">${esc((d.day || '').slice(5))}</div></div>`;
     });
     html += `</div></div>`;
     html += `<div class="card"><h3>По юнитам</h3>`;
     (p.units || []).forEach(function (u) {
-      const pct = u.total ? Math.round((u.done / u.total) * 100) : 0;
-      html += `<p style="margin:4px 0;">${esc(u.n)}. ${esc(u.title)} — ${esc(u.done)}/${esc(u.total)}</p>`;
-      html += `<div class="unit-bar"><div style="width:${pct}%"></div></div>`;
+      const upct = u.total ? Math.round((u.done / u.total) * 100) : 0;
+      html += `<div style="display:flex;justify-content:space-between;gap:8px;margin-top:10px;">
+        <span>${esc(u.num || u.n)}. ${esc(u.title)}</span>
+        <span class="muted">${esc(u.done)}/${esc(u.total)}</span></div>
+        <div class="unit-bar" style="margin-top:6px;"><div style="width:${upct}%"></div></div>`;
     });
     html += `</div>`;
     if (p.errors && p.errors.length) {
@@ -962,17 +1786,24 @@ async function screenProgress() {
       });
       html += `</div>`;
     }
-    app.innerHTML = html;
+    html += `<button class="btn secondary" id="progHome">На главную</button>`;
+    render(html);
+    document.getElementById('progHome').onclick = function () { haptic(); screenHome(); };
     setBack(function () { screenHome(); });
   } catch (e) {
     showNoConn(function () { screenProgress(); });
   }
 }
 
+// ------------------------------------------------------------------ //
+// Ошибки
+// ------------------------------------------------------------------ //
 async function screenErrors() {
   try {
     const d = await apiFetch('/api/errors');
-    let html = `<h1>Мои ошибки</h1>`;
+    let html = `<div class="hero"><div><h1>Мои ошибки</h1>
+      <div class="sub">разбор по тегам и последним ответам</div></div>
+      <div class="pill">${(d.recent || []).length}</div></div>`;
     if (d.tags && d.tags.length) {
       html += `<div class="card"><h3>Теги</h3>`;
       d.tags.forEach(function (t) {
@@ -980,20 +1811,23 @@ async function screenErrors() {
       });
       html += `</div>`;
     } else {
-      html += `<p class="muted">Ошибок пока нет.</p>`;
+      html += `<div class="card">${emptyBlock('✨', 'Ошибок пока нет', 'Реши пару уроков — здесь появится разбор.')}</div>`;
     }
     if (d.recent && d.recent.length) {
       html += `<div class="card"><h3>Последние</h3>`;
       d.recent.forEach(function (r) {
-        html += `<div class="list-item">${esc(r.given)} → <b>${esc(r.expected)}</b> <span class="muted">(${esc(r.title_ru)})</span></div>`;
+        html += `<div class="word-row">
+          <div class="word-main"><b>${esc(r.expected)}</b><span>ты: ${esc(r.given || '—')}</span></div>
+          <span class="muted" style="font-size:12px;">${esc(r.title_ru)}</span>
+        </div>`;
       });
       html += `</div>`;
     }
-    html += `<button class="btn" id="drillBtn">🎯 Тренировать ошибки</button>`;
-    html += `<button class="btn secondary" id="homeBtn">На главную</button>`;
-    app.innerHTML = html;
+    html += `<button class="btn" id="drillBtn">🎯 Тренировать ошибки</button>
+      <button class="btn secondary" id="errHome">На главную</button>`;
+    render(html);
     document.getElementById('drillBtn').onclick = function () { haptic(); doDrill(); };
-    document.getElementById('homeBtn').onclick = function () { haptic(); screenHome(); };
+    document.getElementById('errHome').onclick = function () { haptic(); screenHome(); };
     setBack(function () { screenHome(); });
   } catch (e) {
     showNoConn(function () { screenErrors(); });
@@ -1005,7 +1839,7 @@ async function doDrill() {
     const d = await apiFetch('/api/drill', { method: 'POST' });
     startRunner({ title: d.title, tasks: d.tasks, id: d.id || 'drill' }, 'drill');
   } catch (e) {
-    if (e.message === 'no_mistakes') showAlert('Нет ошибок для тренировки.');
+    if (e.message === 'no_mistakes') toast('Нет ошибок для тренировки.');
     else showNoConn(function () { doDrill(); });
   }
 }

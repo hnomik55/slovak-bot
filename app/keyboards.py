@@ -60,10 +60,11 @@ def units_menu(units: List[Dict[str, Any]], progress: Dict[str, float]) -> Inlin
     kb = InlineKeyboardBuilder()
     for unit in units:
         n = unit.get("n")
+        num = unit.get("num") or n
         done = progress.get(str(n), 0.0)
         mark = "✅" if done >= 0.8 else ("🟡" if done > 0 else "📘")
         kb.button(
-            text="%s %s. %s" % (mark, n, unit.get("title", "")),
+            text="%s %s. %s" % (mark, num, unit.get("title", "")),
             callback_data=f"nav:unit:{n}",
         )
     kb.adjust(1)

@@ -13,3 +13,5 @@ __pycache__/
 .venv/
 tools/bin/
 data/keys/
+
+data/*.bak*

@@ -155,6 +155,22 @@ def save_generated_lesson(
 # --------------------------------------------------------------------------- #
 MASTERY_THRESHOLD = 0.8
 
+LEVELS = ("A1", "A2", "B1", "B2")
+
+
+def user_level(user_id: int) -> str:
+    user = db.get_user(user_id) or {}
+    level = str(user.get("level") or "A1").upper()
+    return level if level in LEVELS else "A1"
+
+
+def units_for_level(level: str) -> List[Dict[str, Any]]:
+    return [u for u in CONTENT.units if (u.get("level") or "A2") == level]
+
+
+def lessons_for_level(level: str, user_id: int) -> List[Dict[str, Any]]:
+    return [l for l in all_lessons(user_id) if (l.get("level") or "A2") == level]
+
 
 def mastery(user_id: int, lesson_id: str) -> float:
     row = db.query_one(
@@ -197,7 +213,10 @@ def is_unlocked(user_id: int, lesson_id: str, lessons: Optional[List[Dict[str, A
 
 
 def next_lesson(user_id: int) -> Optional[Dict[str, Any]]:
-    lessons = all_lessons(user_id)
+    level = user_level(user_id)
+    lessons = [l for l in all_lessons(user_id) if (l.get("level") or "A2") == level]
+    if not lessons:
+        lessons = all_lessons(user_id)
     for lesson in lessons:
         if not lesson_done(user_id, lesson["id"]) and is_unlocked(user_id, lesson["id"], lessons):
             return lesson

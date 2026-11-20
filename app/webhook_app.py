@@ -18,6 +18,7 @@ Railway, Fly.io) и поднимается там как WSGI-приложени
 from __future__ import annotations
 
 import asyncio
+import hmac
 import logging
 from pathlib import Path
 
@@ -104,6 +105,52 @@ def create_app(bot: Bot, dp: Dispatcher) -> Flask:
     @app.route("/health", methods=["GET"])
     def health():
         return jsonify({"ok": True, "mode": CONFIG.mode})
+
+    @app.route("/admin/keys", methods=["POST"])
+    def admin_keys():
+        """Перенос ключей между базами (только админ).
+
+        Заголовок X-Admin-Token должен совпадать с WEBHOOK_SECRET.
+        action=stats | export | import; для import — codes или text,
+        необязательно activated={"КЛЮЧ": telegram_id}.
+        """
+        secret = CONFIG.webhook_secret
+        token = request.headers.get("X-Admin-Token", "")
+        if not secret or not token or not hmac.compare_digest(token, secret):
+            return jsonify({"ok": False, "error": "forbidden"}), 403
+        from app import licensing as licensing_mod
+
+        data = request.get_json(silent=True) or {}
+        action = (data.get("action") or "stats").lower()
+        if action == "export":
+            return jsonify({"ok": True, "state": licensing_mod.export_state()})
+        if action == "import":
+            codes = data.get("codes")
+            if not codes:
+                codes = licensing_mod.parse_codes(data.get("text") or "")
+            added = licensing_mod.import_codes(
+                codes or [],
+                int(data.get("days") or 0),
+                data.get("note") or "",
+                data.get("batch") or "",
+            )
+            activated = 0
+            for code, tg_id in (data.get("activated") or {}).items():
+                try:
+                    if licensing_mod.apply_activation(code, int(tg_id)):
+                        activated += 1
+                except (TypeError, ValueError):
+                    continue
+            licensing_mod.snapshot()
+            return jsonify(
+                {
+                    "ok": True,
+                    "import": added,
+                    "activated": activated,
+                    "stats": licensing_mod.stats(),
+                }
+            )
+        return jsonify({"ok": True, "stats": licensing_mod.stats()})
 
     # --- Mini App ---
     try:

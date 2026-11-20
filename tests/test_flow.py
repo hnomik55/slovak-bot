@@ -145,6 +145,10 @@ async def main() -> int:
     granted, _ = licensing.redeem(license_code, USER_ID)
     assert granted, "не удалось выдать тестовый ключ"
 
+    # Сценарий ниже проверяет уроки A2 (юнит 1 «Знакомство», урок 1a).
+    db.ensure_user(USER_ID, "tester", "Тест")
+    db.execute("UPDATE users SET level = 'A2' WHERE tg_id = ?", (USER_ID,))
+
     dp = Dispatcher(storage=MemoryStorage())
     # Тот же шлюз лицензии, что и в боте
     from app.middleware import LicenseGate

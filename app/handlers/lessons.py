@@ -41,7 +41,9 @@ async def cb_units(cb: CallbackQuery, bot: Bot) -> None:
         )
         return
     progress = level_progress(cb.from_user.id, lessons)
-    stats = content_mod.CONTENT.stats()
+    level = content_mod.user_level(cb.from_user.id)
+    level_lessons = [l for l in lessons if (l.get("level") or "A2") == level]
+    level_units = content_mod.units_for_level(level)
     done_rows = db.query(
         "SELECT correct, total FROM lesson_progress WHERE user_id = ? AND done = 1",
         (cb.from_user.id,),
@@ -50,17 +52,19 @@ async def cb_units(cb: CallbackQuery, bot: Bot) -> None:
     done_correct = sum(int(r.get("correct") or 0) for r in done_rows)
     await safe_edit(
         cb.message,
-        "📚 <b>Уроки</b>\n\nПройдено: %d из %d · заданий в контенте: %d\n"
+        "📚 <b>Уроки · уровень %s</b>\n\nПройдено: %d из %d · заданий в уровне: %d\n"
         "Все уроки доступны сразу — бери любой, отмечай пройденные ✅\n\n"
-        "Заданий решено: <b>%d</b> · верно: %d"
+        "Заданий решено: <b>%d</b> · верно: %d\n"
+        "<i>Уровень меняется в настройках: 🎚 Уровень</i>"
         % (
-            content_mod.completed_count(cb.from_user.id),
-            len(lessons),
-            stats["tasks"],
+            level,
+            sum(1 for l in level_lessons if content_mod.lesson_done(cb.from_user.id, l["id"])),
+            len(level_lessons),
+            sum(len(l.get("tasks") or []) for l in level_lessons),
             done_tasks,
             done_correct,
         ),
-        reply_markup=units_menu(content_mod.CONTENT.units, progress),
+        reply_markup=units_menu(level_units, progress),
     )
 
 
@@ -85,7 +89,8 @@ async def cb_unit(cb: CallbackQuery, bot: Bot) -> None:
     unit = next((u for u in content_mod.CONTENT.units if str(u.get("n")) == str(unit_no)), None)
     title = unit.get("title", "") if unit else ""
     desc = unit.get("desc", "") if unit else ""
-    header = "🧩 <b>Юнит %s. %s</b>" % (unit_no, title)
+    num = (unit.get("num") or unit_no) if unit else unit_no
+    header = "🧩 <b>Юнит %s. %s</b>" % (num, title)
     if desc:
         header += "\n<i>%s</i>" % trim(desc, 200)
     await safe_edit(cb.message, header, reply_markup=lessons_menu(unit_no, unit_lessons, states))
@@ -101,7 +106,7 @@ def _lesson_card(lesson: Dict[str, Any]) -> str:
         lines.append("<i>%s</i>" % sub)
     unit = content_mod.CONTENT.unit_of(lesson["id"])
     if unit:
-        lines.append("Юнит %s · %s" % (unit.get("n"), unit.get("title", "")))
+        lines.append("Юнит %s · %s" % (unit.get("num") or unit.get("n"), unit.get("title", "")))
     lines.append("Заданий: %d" % len(lesson.get("tasks") or []))
 
     rule = lesson.get("rule")

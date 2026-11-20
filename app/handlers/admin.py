@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import io
 import logging
 import sys
 
 from aiogram import Router
 from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.types import BufferedInputFile, Message
 
 from app import content as content_mod
 from app import db
@@ -154,6 +155,9 @@ async def cmd_keys(message: Message) -> None:
 
     /admin_key make 10 30 почта@пример   -> 10 ключей на 30 дней
     /admin_key make 5 0                  -> 5 бессрочных ключей
+    /admin_key import                    -> импорт партии (ответом на .txt/.csv)
+    /admin_key import КЛЮЧ1 КЛЮЧ2        -> импорт вставленных ключей
+    /admin_key export                    -> выгрузить все ключи файлом
     /admin_key list                      -> список ключей
     /admin_key unused                    -> только неиспользованные
     /admin_key revoke SLOV-XXXXX-...     -> отозвать ключ
@@ -175,6 +179,63 @@ async def cmd_keys(message: Message) -> None:
             "🔑 Создано ключей: <b>%d</b> (%s)\n\n<code>%s</code>\n\n"
             "Отправь их покупателям. Каждый ключ работает один раз."
             % (len(codes), plan, "\n".join(codes))
+        )
+        return
+
+    if action == "import":
+        text = ""
+        document = message.reply_to_message.document if message.reply_to_message else None
+        if document:
+            buffer = io.BytesIO()
+            try:
+                await message.bot.download(document, destination=buffer)
+                text = buffer.getvalue().decode("utf-8", "replace")
+            except Exception as exc:
+                await message.answer("Не удалось прочитать файл: %s" % exc)
+                return
+        else:
+            parts = message.text.split(maxsplit=2)
+            text = parts[2] if len(parts) > 2 else ""
+
+        codes = licensing.parse_codes(text)
+        if not codes:
+            await message.answer(
+                "Не вижу ключей.\n\n"
+                "Пришли файл .txt/.csv ответом на команду:\n"
+                "<code>/admin_key import</code> (реплай на файл)\n\n"
+                "Или вставь ключи в сообщение:\n"
+                "<code>/admin_key import КЛЮЧ1 КЛЮЧ2 ...</code>"
+            )
+            return
+
+        added = licensing.import_codes(codes, 0, "", "import")
+        await message.answer(
+            "📥 <b>Импорт ключей</b>\n\n"
+            "Найдено: <b>%d</b>\nДобавлено: <b>%d</b>\nУже были: <b>%d</b>\n\n"
+            "Всего в базе: <b>%d</b>"
+            % (
+                added["received"],
+                added["imported"],
+                added["existing"],
+                licensing.stats()["total"],
+            )
+        )
+        return
+
+    if action == "export":
+        rows = licensing.list_licenses(5000)
+        if not rows:
+            await message.answer("Ключей в базе нет.")
+            return
+        header = [
+            "# Ключи активации (выгрузка %s)" % db.now(),
+            "# Строк: %d. Импорт: /admin_key import (ответом на этот файл)." % len(rows),
+            "",
+        ]
+        payload = "\n".join(header + [row["code"] for row in rows]) + "\n"
+        await message.answer_document(
+            BufferedInputFile(payload.encode("utf-8"), filename="keys-export.txt"),
+            caption="🔑 Ключей: <b>%d</b>" % len(rows),
         )
         return
 
@@ -236,6 +297,8 @@ async def cmd_keys(message: Message) -> None:
         "🔑 <b>Ключи</b>\n\n"
         "Всего: <b>%d</b> · использовано: <b>%d</b> · активных подписок: <b>%d</b>\n\n"
         "Создать: <code>/admin_key make 10 30</code>\n"
+        "Импорт: <code>/admin_key import</code> (ответом на файл)\n"
+        "Выгрузить: <code>/admin_key export</code>\n"
         "Список: <code>/admin_key list</code>\n"
         "Подписчики: <code>/admin_key subs</code>"
         % (stats["total"], stats["used"], stats["active"])

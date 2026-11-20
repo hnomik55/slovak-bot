@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import logging
 import random
+import re
 from typing import Any, Dict, List, Optional
 
 from flask import Blueprint, jsonify, request
@@ -255,7 +256,9 @@ def api_home():
     if error:
         return error
     user = db.get_user(user_id) or {}
+    level = content_mod.user_level(user_id)
     lessons = content_mod.all_lessons(user_id)
+    level_lessons = [l for l in lessons if (l.get("level") or "A2") == level]
     stats = content_mod.CONTENT.stats()
 
     done_rows = db.query(
@@ -281,18 +284,25 @@ def api_home():
     correct_week = sum(r["correct"] or 0 for r in week)
 
     units = []
-    for unit in content_mod.CONTENT.units:
+    for unit in content_mod.units_for_level(level):
         unit_lessons = [l for l in lessons if str(l.get("unit")) == str(unit.get("n"))]
         done = sum(1 for l in unit_lessons if content_mod.lesson_done(user_id, l["id"]))
         units.append(
             {
                 "n": unit.get("n"),
+                "num": unit.get("num") or unit.get("n"),
+                "level": unit.get("level", "A2"),
                 "title": unit.get("title", ""),
                 "desc": unit.get("desc", ""),
                 "lessons_done": done,
                 "lessons_total": len(unit_lessons),
             }
         )
+
+    levels = []
+    for code in content_mod.LEVELS:
+        code_lessons = [l for l in lessons if (l.get("level") or "A2") == code]
+        levels.append({"code": code, "lessons": len(code_lessons)})
 
     weak = db.query(
         "SELECT tag, count FROM error_tags WHERE user_id = ? ORDER BY count DESC LIMIT 6", (user_id,)
@@ -301,14 +311,15 @@ def api_home():
 
     return jsonify(
         {
-            "level": user.get("level", "A1"),
+            "level": level,
+            "levels": levels,
             "xp": user.get("xp", 0),
             "streak": user.get("streak", 0),
             "best_streak": user.get("best_streak", 0),
-            "lessons_done": content_mod.completed_count(user_id),
-            "lessons_total": len(lessons),
+            "lessons_done": sum(1 for l in level_lessons if content_mod.lesson_done(user_id, l["id"])),
+            "lessons_total": len(level_lessons),
             "tasks_done": tasks_done,
-            "tasks_total": stats["tasks"],
+            "tasks_total": sum(len(l.get("tasks") or []) for l in level_lessons),
             "accuracy": int(round(100 * correct_week / tasks_week)) if tasks_week else 0,
             "words_learned": int(words_learned["n"]) if words_learned else 0,
             "words_due": int(words_due["n"]) if words_due else 0,
@@ -331,12 +342,17 @@ def api_units():
     user_id, error = require_user()
     if error:
         return error
+    level = (request.args.get("level") or content_mod.user_level(user_id)).upper()
+    if level not in content_mod.LEVELS:
+        level = content_mod.user_level(user_id)
     lessons = content_mod.all_lessons(user_id)
     out = []
-    for unit in content_mod.CONTENT.units:
+    for unit in content_mod.units_for_level(level):
         unit_lessons = []
         for lesson in lessons:
             if str(lesson.get("unit")) != str(unit.get("n")):
+                continue
+            if (lesson.get("level") or "A2") != level:
                 continue
             unit_lessons.append(
                 {
@@ -351,12 +367,32 @@ def api_units():
         out.append(
             {
                 "n": unit.get("n"),
+                "num": unit.get("num") or unit.get("n"),
+                "level": unit.get("level", "A2"),
                 "title": unit.get("title", ""),
                 "desc": unit.get("desc", ""),
                 "lessons": unit_lessons,
             }
         )
-    return jsonify({"units": out})
+    levels = []
+    for code in content_mod.LEVELS:
+        code_lessons = [l for l in lessons if (l.get("level") or "A2") == code]
+        levels.append({"code": code, "lessons": len(code_lessons)})
+    return jsonify({"level": level, "levels": levels, "units": out})
+
+
+@bp.post("/level")
+def api_level():
+    """Переключение уровня: от него зависят уроки, юниты и новые слова."""
+    user_id, error = require_user()
+    if error:
+        return error
+    data = request.get_json(silent=True) or {}
+    level = str(data.get("level") or "").upper()
+    if level not in content_mod.LEVELS:
+        return jsonify({"error": "bad_level"}), 400
+    db.execute("UPDATE users SET level = ? WHERE tg_id = ?", (level, user_id))
+    return jsonify({"ok": True, "level": level})
 
 
 @bp.get("/lesson/<lesson_id>")
@@ -589,6 +625,247 @@ def api_vocab_rate():
 
 
 # --------------------------------------------------------------------------- #
+# Свои карточки и словари по уровням
+# --------------------------------------------------------------------------- #
+MAX_CARD_LEN = 120
+
+
+def _pair_from_line(line: str):
+    """«slovo — перевод», «slovo - перевод», «slovo<TAB>перевод» -> (sk, ru)."""
+    line = (line or "").strip()
+    if not line or line.startswith("#"):
+        return None
+    if "\t" in line:
+        sk, ru = line.split("\t", 1)
+        return sk.strip(), ru.strip()
+    for sep in (" — ", " – ", " - ", " = ", ";"):
+        if sep in line:
+            sk, ru = line.split(sep, 1)
+            return sk.strip(), ru.strip()
+    return None
+
+
+def _add_custom_card(user_id: int, level: str, sk: str, ru: str):
+    sk = (sk or "").strip()
+    ru = (ru or "").strip()
+    if not sk or not ru or len(sk) > MAX_CARD_LEN or len(ru) > MAX_CARD_LEN:
+        return None
+    ids = add_words(level, [(sk, ru)], group="мои карточки")
+    vocab_id = ids[0] if ids else None
+    row = db.query_one(
+        "SELECT id FROM user_cards WHERE user_id = ? AND lower(sk) = lower(?)", (user_id, sk)
+    )
+    if row:
+        db.execute(
+            "UPDATE user_cards SET ru = ?, vocab_id = ? WHERE id = ?", (ru, vocab_id, row["id"])
+        )
+        card_id = int(row["id"])
+    else:
+        db.execute(
+            "INSERT INTO user_cards(user_id, sk, ru, vocab_id, created_at) VALUES(?,?,?,?,?)",
+            (user_id, sk, ru, vocab_id, db.now()),
+        )
+        created = db.query_one(
+            "SELECT id FROM user_cards WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,)
+        )
+        card_id = int(created["id"]) if created else 0
+    if vocab_id:
+        enroll(user_id, [vocab_id])
+    return {"id": card_id, "sk": sk, "ru": ru, "vocab_id": vocab_id}
+
+
+def _vocab_stats(user_id: int) -> Dict[str, int]:
+    total = db.query_one("SELECT COUNT(*) AS n FROM user_words WHERE user_id = ?", (user_id,))
+    due = db.query_one(
+        "SELECT COUNT(*) AS n FROM user_words WHERE user_id = ? AND due <= ?",
+        (user_id, db.today()),
+    )
+    custom = db.query_one("SELECT COUNT(*) AS n FROM user_cards WHERE user_id = ?", (user_id,))
+    return {
+        "in_train": int(total["n"]) if total else 0,
+        "due": int(due["n"]) if due else 0,
+        "custom": int(custom["n"]) if custom else 0,
+    }
+
+
+@bp.get("/vocab/mine")
+def api_vocab_mine():
+    user_id, error = require_user()
+    if error:
+        return error
+    rows = db.query(
+        """SELECT c.id, c.sk, c.ru, c.vocab_id, uw.state, uw.interval
+           FROM user_cards c
+           LEFT JOIN user_words uw
+             ON uw.user_id = c.user_id AND uw.vocab_id = c.vocab_id
+           WHERE c.user_id = ? ORDER BY c.id DESC""",
+        (user_id,),
+    )
+    return jsonify(
+        {
+            "cards": [
+                {
+                    "id": r["id"],
+                    "sk": r["sk"],
+                    "ru": r["ru"],
+                    "vocab_id": r["vocab_id"],
+                    "state": r.get("state") or "new",
+                    "interval": r.get("interval") or 0,
+                }
+                for r in rows
+            ],
+            "stats": _vocab_stats(user_id),
+        }
+    )
+
+
+@bp.post("/vocab/custom")
+def api_vocab_custom():
+    user_id, error = require_user()
+    if error:
+        return error
+    data = request.get_json(silent=True) or {}
+    level = content_mod.user_level(user_id)
+    card = _add_custom_card(user_id, level, data.get("sk") or "", data.get("ru") or "")
+    if not card:
+        return jsonify({"error": "bad_card"}), 400
+    return jsonify({"ok": True, "card": card, "stats": _vocab_stats(user_id)})
+
+
+@bp.post("/vocab/custom/bulk")
+def api_vocab_custom_bulk():
+    user_id, error = require_user()
+    if error:
+        return error
+    data = request.get_json(silent=True) or {}
+    text = str(data.get("text") or "")
+    level = content_mod.user_level(user_id)
+    added = 0
+    skipped = 0
+    for line in text.splitlines():
+        pair = _pair_from_line(line)
+        if not pair:
+            if line.strip() and not line.strip().startswith("#"):
+                skipped += 1
+            continue
+        card = _add_custom_card(user_id, level, pair[0], pair[1])
+        if card:
+            added += 1
+        else:
+            skipped += 1
+    return jsonify({"ok": True, "added": added, "skipped": skipped, "stats": _vocab_stats(user_id)})
+
+
+@bp.delete("/vocab/custom/<int:card_id>")
+def api_vocab_custom_delete(card_id: int):
+    user_id, error = require_user()
+    if error:
+        return error
+    row = db.query_one(
+        "SELECT * FROM user_cards WHERE id = ? AND user_id = ?", (card_id, user_id)
+    )
+    if not row:
+        return jsonify({"error": "not_found"}), 404
+    if row.get("vocab_id"):
+        db.execute(
+            "DELETE FROM user_words WHERE user_id = ? AND vocab_id = ?",
+            (user_id, row["vocab_id"]),
+        )
+    db.execute("DELETE FROM user_cards WHERE id = ? AND user_id = ?", (card_id, user_id))
+    return jsonify({"ok": True, "stats": _vocab_stats(user_id)})
+
+
+@bp.get("/vocab/browse")
+def api_vocab_browse():
+    user_id, error = require_user()
+    if error:
+        return error
+    level = (request.args.get("level") or content_mod.user_level(user_id)).upper()
+    if level not in content_mod.LEVELS:
+        level = content_mod.user_level(user_id)
+    query = (request.args.get("q") or "").strip()
+    limit = min(int(request.args.get("limit", 200)), 500)
+
+    sql = """
+        SELECT v.id, v.sk, v.ru, v.group_name,
+               CASE WHEN uw.vocab_id IS NULL THEN 0 ELSE 1 END AS added
+        FROM vocab v
+        LEFT JOIN user_words uw ON uw.vocab_id = v.id AND uw.user_id = ?
+        WHERE v.level = ?
+    """
+    params: List[Any] = [user_id, level]
+    if query:
+        sql += " AND (v.sk LIKE ? OR v.ru LIKE ?)"
+        like = "%" + query + "%"
+        params.extend([like, like])
+    sql += " ORDER BY v.group_name, v.id LIMIT ?"
+    params.append(limit)
+    rows = db.query(sql, params)
+
+    counts = {r["level"]: int(r["n"]) for r in db.query("SELECT level, COUNT(*) AS n FROM vocab GROUP BY level")}
+    enrolled = {
+        r["level"]: int(r["n"])
+        for r in db.query(
+            """SELECT v.level, COUNT(*) AS n FROM user_words uw
+               JOIN vocab v ON v.id = uw.vocab_id WHERE uw.user_id = ? GROUP BY v.level""",
+            (user_id,),
+        )
+    }
+    return jsonify(
+        {
+            "level": level,
+            "levels": [
+                {
+                    "code": code,
+                    "total": counts.get(code, 0),
+                    "enrolled": enrolled.get(code, 0),
+                }
+                for code in content_mod.LEVELS
+            ],
+            "cards": [
+                {
+                    "id": r["id"],
+                    "sk": r["sk"],
+                    "ru": r["ru"],
+                    "group": r.get("group_name") or "",
+                    "added": bool(r["added"]),
+                }
+                for r in rows
+            ],
+            "stats": _vocab_stats(user_id),
+        }
+    )
+
+
+@bp.post("/vocab/add")
+def api_vocab_add():
+    user_id, error = require_user()
+    if error:
+        return error
+    data = request.get_json(silent=True) or {}
+    ids: List[int] = []
+    if data.get("all"):
+        level = str(data.get("level") or content_mod.user_level(user_id)).upper()
+        if level not in content_mod.LEVELS:
+            return jsonify({"error": "bad_level"}), 400
+        rows = db.query("SELECT id FROM vocab WHERE level = ?", (level,))
+        ids = [int(r["id"]) for r in rows]
+    else:
+        for value in data.get("ids") or []:
+            try:
+                ids.append(int(value))
+            except (TypeError, ValueError):
+                continue
+    if not ids:
+        return jsonify({"error": "no_ids"}), 400
+
+    before = _vocab_stats(user_id)["in_train"]
+    enroll(user_id, ids)
+    stats = _vocab_stats(user_id)
+    return jsonify({"ok": True, "added": max(0, stats["in_train"] - before), "stats": stats})
+
+
+# --------------------------------------------------------------------------- #
 # Прогресс и ошибки
 # --------------------------------------------------------------------------- #
 @bp.get("/progress")
@@ -597,7 +874,9 @@ def api_progress():
     if error:
         return error
     user = db.get_user(user_id) or {}
+    level = content_mod.user_level(user_id)
     lessons = content_mod.all_lessons(user_id)
+    level_lessons = [l for l in lessons if (l.get("level") or "A2") == level]
 
     done_rows = db.query(
         "SELECT correct, total FROM lesson_progress WHERE user_id = ? AND done = 1", (user_id,)
@@ -619,11 +898,17 @@ def api_progress():
         (user_id,),
     )
     units = []
-    for unit in content_mod.CONTENT.units:
+    for unit in content_mod.units_for_level(level):
         unit_lessons = [l for l in lessons if str(l.get("unit")) == str(unit.get("n"))]
         done = sum(1 for l in unit_lessons if content_mod.lesson_done(user_id, l["id"]))
         units.append(
-            {"n": unit.get("n"), "title": unit.get("title", ""), "done": done, "total": len(unit_lessons)}
+            {
+                "n": unit.get("n"),
+                "num": unit.get("num") or unit.get("n"),
+                "title": unit.get("title", ""),
+                "done": done,
+                "total": len(unit_lessons),
+            }
         )
     errors = db.query(
         "SELECT tag, count FROM error_tags WHERE user_id = ? ORDER BY count DESC LIMIT 12", (user_id,)
@@ -632,10 +917,11 @@ def api_progress():
     return jsonify(
         {
             "xp": user.get("xp", 0),
+            "level": level,
             "streak": user.get("streak", 0),
             "best_streak": user.get("best_streak", 0),
-            "lessons_done": content_mod.completed_count(user_id),
-            "lessons_total": len(lessons),
+            "lessons_done": sum(1 for l in level_lessons if content_mod.lesson_done(user_id, l["id"])),
+            "lessons_total": len(level_lessons),
             "tasks_done": tasks_done,
             "accuracy": int(round(100 * tasks_correct / tasks_done)) if tasks_done else 0,
             "words_learned": int(words_learned["n"]) if words_learned else 0,

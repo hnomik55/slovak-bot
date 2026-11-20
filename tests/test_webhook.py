@@ -140,6 +140,49 @@ def main() -> int:
     response = client.get("/cron/wrong")
     check("cron с чужим секретом отклонён", response.status_code == 403, str(response.status_code))
 
+    print("\n== Перенос ключей по HTTP ==")
+    response = client.post(
+        "/admin/keys", json={"action": "import", "codes": ["AAAAAAAAAAAAAAAAAAAA"]}
+    )
+    check("без токена отклонено", response.status_code == 403, str(response.status_code))
+
+    batch = "# партия\nAAAAAAAAAAAAAAAAAAAA\nBBBBBBBBBBBBBBBBBBBB\n"
+    response = client.post(
+        "/admin/keys",
+        json={"action": "import", "text": batch, "batch": "http"},
+        headers={"X-Admin-Token": "testsecret123"},
+    )
+    data = response.get_json() or {}
+    check(
+        "импорт по HTTP прошёл",
+        response.status_code == 200 and (data.get("import") or {}).get("imported") == 2,
+        str(data),
+    )
+
+    response = client.post(
+        "/admin/keys", json={"action": "stats"}, headers={"X-Admin-Token": "testsecret123"}
+    )
+    check(
+        "stats видит импортированные ключи",
+        (response.get_json() or {}).get("stats", {}).get("total", 0) >= 2,
+        response.get_data(as_text=True),
+    )
+
+    response = client.post(
+        "/admin/keys",
+        json={
+            "action": "import",
+            "codes": ["CCCCCCCCCCCCCCCCCCCC"],
+            "activated": {"CCCCCCCCCCCCCCCCCCCC": 424242},
+        },
+        headers={"X-Admin-Token": "testsecret123"},
+    )
+    check(
+        "активация восстановлена по HTTP",
+        response.status_code == 200 and (response.get_json() or {}).get("activated") == 1,
+        response.get_data(as_text=True),
+    )
+
     shutil.rmtree(TMP, ignore_errors=True)
     print("\nИтого: %d ok, %d fail" % (PASSED, FAILED))
     return 1 if FAILED else 0

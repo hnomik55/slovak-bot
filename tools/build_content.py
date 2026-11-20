@@ -27,6 +27,14 @@ from typing import Any, Dict, List, Optional
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+
+try:  # при запуске файлом и при импорте как tools.build_content
+    from levels import LEVEL_RANK, build_level_courses
+except ImportError:  # pragma: no cover
+    from tools.levels import LEVEL_RANK, build_level_courses  # type: ignore
+
 DEFAULT_SOURCE = Path(r"D:\Slovakia")
 DEFAULT_OUT = ROOT / "data"
 
@@ -342,10 +350,54 @@ def build(source: Path, out: Path) -> Dict[str, Any]:
     out.mkdir(parents=True, exist_ok=True)
 
     units = extract_units(source / "app" / "slovencina.html")
+    # Основной курс из HTML-тренажёра — уровень A2.
+    for unit in units:
+        unit["level"] = "A2"
+        unit["num"] = unit.get("n")
     lessons = build_lessons(units)
+    for lesson in lessons:
+        lesson["level"] = "A2"
+
+    # Курсы A1, B1, B2 и пустые юниты A2 (8–10) собираются из словарей.
+    level_units, level_lessons = build_level_courses(source)
+    units = units + level_units
+    lessons = lessons + level_lessons
+
+    # Юниты с одинаковым n (A2 8–10: каркас из HTML + план из словаря) сливаем:
+    # заголовок и описание берём из плана, уроки — из общего списка ниже.
+    merged: Dict[str, Dict[str, Any]] = {}
+    for unit in units:
+        key = str(unit.get("n"))
+        if key in merged:
+            merged[key]["title"] = unit.get("title") or merged[key].get("title", "")
+            merged[key]["desc"] = unit.get("desc") or merged[key].get("desc", "")
+            merged[key]["level"] = unit.get("level") or merged[key].get("level", "A2")
+            merged[key]["num"] = unit.get("num") or merged[key].get("num")
+        else:
+            merged[key] = dict(unit)
+    units = list(merged.values())
+
+    # Списки уроков в юнитах собираем из самих уроков: так в пустые каркасы
+    # A2 (8–10) попадают сгенерированные уроки, а не остаются пустые юниты.
+    by_unit: Dict[str, List[str]] = {}
+    for lesson in lessons:
+        by_unit.setdefault(str(lesson.get("unit")), []).append(lesson["id"])
+    for unit in units:
+        ids = by_unit.get(str(unit.get("n")))
+        if ids:
+            unit["lessons"] = ids
+
+    units.sort(key=lambda u: (LEVEL_RANK.get(u.get("level", "A2"), 99), u.get("num") or u.get("n") or 0))
+    lessons.sort(
+        key=lambda l: (
+            LEVEL_RANK.get(l.get("level", "A2"), 99),
+            str(l.get("unit")),
+            str(l.get("id")),
+        )
+    )
 
     vocab: List[Dict[str, Any]] = []
-    for level in ("A1", "A2", "B1"):
+    for level in ("A1", "A2", "B1", "B2"):
         vocab.extend(parse_vocab(source / "slovar" / ("slova-%s.txt" % level), level))
 
     content = {
@@ -360,9 +412,13 @@ def build(source: Path, out: Path) -> Dict[str, Any]:
         "units": [
             {
                 "n": u.get("n"),
+                "num": u.get("num") or u.get("n"),
+                "level": u.get("level", "A2"),
                 "title": u.get("title", ""),
                 "desc": u.get("desc", ""),
-                "lessons": [l["id"] for l in (u.get("lessons") or [])],
+                "lessons": [
+                    l["id"] if isinstance(l, dict) else l for l in (u.get("lessons") or [])
+                ],
             }
             for u in units
         ],

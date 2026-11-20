@@ -138,6 +138,54 @@ def main() -> int:
     words_900 = db.query("SELECT COUNT(*) AS n FROM user_words WHERE user_id = 900")
     check("карточки слов раздельные", words_500[0]["n"] == 0 and words_900[0]["n"] == 0)
 
+    print("\n== Перенос ключей между базами ==")
+    portable = licensing.create_keys(2, 0, "", "portable")
+    hash_key = "#" + "A" * 19
+    source_text = (
+        "# комментарий партии\n"
+        "\n"
+        "%s\n"
+        "%s\n"
+        "%s\n"
+        "key,batch\n"
+        "%s,portable\n" % (portable[0], portable[1], hash_key, portable[0])
+    )
+    parsed = licensing.parse_codes(source_text)
+    check("ключи из txt разобраны", portable[0] in parsed and portable[1] in parsed, str(parsed))
+    check("ключ с решёткой не потерян", hash_key in parsed, str(parsed))
+    check("повторы схлопнуты", len(parsed) == len(set(parsed)), str(parsed))
+    check("комментарий не стал ключом", len(parsed) == 3, str(parsed))
+
+    first = licensing.import_codes([hash_key], 0, "", "portable")
+    second = licensing.import_codes([hash_key], 0, "", "portable")
+    check("импорт добавляет ключ", first["imported"] == 1, str(first))
+    check(
+        "повторный импорт не дублирует",
+        second["imported"] == 0 and second["existing"] == 1,
+        str(second),
+    )
+    ok_import, msg_import = licensing.redeem(hash_key, 950)
+    check("импортированный ключ работает", ok_import, msg_import)
+    db.execute("DELETE FROM subscriptions WHERE telegram_id = 950")
+    db.execute("UPDATE licenses SET used_by = NULL, used_at = NULL WHERE code = ?", (hash_key,))
+    licensing.snapshot()
+
+    kept_db = CONFIG.db_path
+    CONFIG.db_path = TMP / "fresh.db"
+    db.init_db()
+    before = db.query_one("SELECT COUNT(*) AS n FROM licenses")["n"]
+    restored = licensing.restore_state()
+    after = db.query_one("SELECT COUNT(*) AS n FROM licenses")["n"]
+    check(
+        "пустая база получила ключи из снимка",
+        before == 0 and after >= 6,
+        "%s -> %s (%s)" % (before, after, restored),
+    )
+    check("восстановлен использованный ключ", licensing.get_license(codes[0]) is not None)
+    check("восстановлена подписка", licensing.is_active(500))
+    check("снимок не потерял новые ключи", licensing.get_license(hash_key) is not None)
+    CONFIG.db_path = kept_db
+
     print("\n== Сводка ==")
     stats = licensing.stats()
     check("счётчики считаются", stats["total"] >= 5 and stats["used"] >= 4, str(stats))

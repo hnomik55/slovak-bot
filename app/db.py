@@ -62,6 +62,15 @@ CREATE TABLE IF NOT EXISTS user_words (
     PRIMARY KEY (user_id, vocab_id)
 );
 
+CREATE TABLE IF NOT EXISTS user_cards (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER,
+    sk         TEXT,
+    ru         TEXT,
+    vocab_id   INTEGER,
+    created_at TEXT
+);
+
 CREATE TABLE IF NOT EXISTS lesson_progress (
     user_id    INTEGER,
     lesson_id  TEXT,
@@ -155,6 +164,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 CREATE INDEX IF NOT EXISTS idx_licenses_used ON licenses(used_by);
 CREATE INDEX IF NOT EXISTS idx_attempts_user ON attempts(user_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_user_words_due ON user_words(user_id, due);
+CREATE INDEX IF NOT EXISTS idx_user_cards_user ON user_cards(user_id);
 CREATE INDEX IF NOT EXISTS idx_daily_stats_user ON daily_stats(user_id, day);
 """
 

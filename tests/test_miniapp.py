@@ -102,17 +102,25 @@ def main() -> int:
     response = client.get("/api/session", headers={"X-Telegram-Init-Data": "broken=1"})
     check("битая подпись -> 401", response.status_code == 401, str(response.status_code))
 
+    # Дальше проверяем уроки A2: у нового пользователя уровень по умолчанию A1.
+    client.post("/api/level", json={"level": "A2"}, headers=headers)
+
     print("\n== Главный экран ==")
     body = client.get("/api/home", headers=headers).get_json()
-    check("есть уровень", "level" in body)
+    check("есть уровень", body.get("level") == "A2", str(body.get("level")))
     check("есть юниты", len(body["units"]) == 10, str(len(body["units"])))
     check("есть следующий урок", body["next_lesson"] is not None, str(body["next_lesson"]))
     check("счётчик слов есть", "words_due" in body)
+    check(
+        "уровни A1-B2",
+        [x["code"] for x in body.get("levels", [])] == ["A1", "A2", "B1", "B2"],
+        str(body.get("levels")),
+    )
 
     print("\n== Юниты и уроки ==")
     body = client.get("/api/units", headers=headers).get_json()
     lessons = [l for u in body["units"] for l in u["lessons"]]
-    check("41 урок", len(lessons) == 41, str(len(lessons)))
+    check("уроков в A2 больше 50", len(lessons) >= 50, str(len(lessons)))
     check("все уроки доступны", all(not l["locked"] for l in lessons))
 
     print("\n== Урок и утечка ответов ==")
@@ -184,6 +192,36 @@ def main() -> int:
     check("карточка сохранена в SRS", stored is not None, str(stored))
     check("интервал записан", int(stored["interval"]) >= 1, str(stored))
     check("дата следующего повторения впереди", stored["due"] > db.today(), str(stored["due"]))
+
+    print("\n== Свои карточки и словари ==")
+    body = client.post(
+        "/api/vocab/custom",
+        json={"sk": "skúška", "ru": "экзамен"},
+        headers=headers,
+    ).get_json()
+    check("карточка добавлена", body.get("ok") is True, str(body))
+    card_id = (body.get("card") or {}).get("id")
+    mine = client.get("/api/vocab/mine", headers=headers).get_json()
+    check("карточка в моих", any(c["sk"] == "skúška" for c in mine["cards"]), str(mine)[:200])
+    check("счётчик своих карточек", mine["stats"]["custom"] >= 1, str(mine["stats"]))
+
+    body = client.post(
+        "/api/vocab/custom/bulk",
+        json={"text": "čaj — чай\nkáva — кофе\nмусор\n"},
+        headers=headers,
+    ).get_json()
+    check("список добавлен", body.get("added") == 2, str(body))
+    check("плохая строка пропущена", body.get("skipped") == 1, str(body))
+
+    body = client.get("/api/vocab/browse?level=B2", headers=headers).get_json()
+    check("словарь B2 не пуст", len(body["cards"]) > 50, str(len(body["cards"])))
+    check("есть счётчики уровней", len(body["levels"]) == 4, str(body["levels"]))
+    first = body["cards"][0]["id"]
+    added = client.post("/api/vocab/add", json={"ids": [first]}, headers=headers).get_json()
+    check("слово из словаря добавлено", added.get("ok") is True, str(added))
+
+    body = client.delete("/api/vocab/custom/%s" % card_id, headers=headers).get_json()
+    check("своя карточка удалена", body.get("ok") is True, str(body))
 
     print("\n== Прогресс и ошибки ==")
     body = client.get("/api/progress", headers=headers).get_json()

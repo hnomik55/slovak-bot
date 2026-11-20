@@ -15,7 +15,7 @@ from app.utils import safe_edit
 log = logging.getLogger("settings")
 router = Router(name="settings")
 
-LEVELS = [("A1", "Начальный"), ("A2", "Базовый"), ("B1", "Продвинутый")]
+LEVELS = [("A1", "Начальный"), ("A2", "Базовый"), ("B1", "Продвинутый"), ("B2", "Свободный")]
 MINUTES = [15, 30, 45, 60]
 REMINDERS = [("off", "Выключить"), ("19:00", "19:00"), ("21:00", "21:00"), ("23:00", "23:00")]
 
