@@ -1,0 +1,16 @@
+{
+  "url": "https://api.github.com/repos/hnomik55/slovak-bot/pages",
+  "status": "building",
+  "cname": null,
+  "custom_404": false,
+  "html_url": "https://hnomik55.github.io/slovak-bot/",
+  "build_type": "legacy",
+  "source": {
+    "branch": "main",
+    "path": "/docs"
+  },
+  "public": true,
+  "protected_domain_state": null,
+  "pending_domain_unverified_at": null,
+  "https_enforced": true
+}
