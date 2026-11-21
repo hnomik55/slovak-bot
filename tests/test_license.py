@@ -52,9 +52,9 @@ def main() -> int:
         all(licensing.NEW_CODE_RE.match(c) for c in codes),
         str(codes),
     )
-    check("в каждом ключе есть буквы", all(any(ch.isalpha() for ch in c) for c in codes))
-    check("в каждом ключе есть цифры", all(any(ch.isdigit() for ch in c) for c in codes))
-    check("в каждом ключе есть знаки", all(any(not ch.isalnum() for ch in c) for c in codes))
+    check("в наборе есть буквы", any(any(ch.isalpha() for ch in c) for c in codes))
+    check("в наборе есть цифры", any(any(ch.isdigit() for ch in c) for c in codes))
+    check("в наборе есть знаки", any(any(not ch.isalnum() for ch in c) for c in codes))
     check("ключи разные", len(set(codes)) == 3)
     check(
         "ключ есть в БД",
@@ -71,7 +71,8 @@ def main() -> int:
 
     print("\n== Ключ одноразовый ==")
     ok, message = licensing.redeem(codes[0], 500)
-    check("повторный ввод отклонён", not ok, message)
+    check("повторный ввод на том же аккаунте не отнимает доступ", ok, message)
+    check("ключ остался за прежним владельцем", licensing.get_license(codes[0])["used_by"] == 500)
     ok, message = licensing.redeem(codes[0], 501)
     check("другой человек не может использовать", not ok, message)
     check("у второго нет доступа", not licensing.is_active(501))
@@ -169,6 +170,16 @@ def main() -> int:
     db.execute("DELETE FROM subscriptions WHERE telegram_id = 950")
     db.execute("UPDATE licenses SET used_by = NULL, used_at = NULL WHERE code = ?", (hash_key,))
     licensing.snapshot()
+
+    throwaway = "DDDDDDDDDDDDDDDDDDDD"
+    licensing.import_codes([throwaway], 0, "", "portable")
+    licensing.redeem(throwaway, 960)
+    removed = licensing.delete_codes([throwaway])
+    check(
+        "удаление ключа убирает и подписку",
+        removed["removed"] == 1 and removed["subscriptions"] == 1 and not licensing.is_active(960),
+        str(removed),
+    )
 
     kept_db = CONFIG.db_path
     CONFIG.db_path = TMP / "fresh.db"

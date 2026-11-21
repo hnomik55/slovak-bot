@@ -183,6 +183,17 @@ def main() -> int:
         response.get_data(as_text=True),
     )
 
+    response = client.post(
+        "/admin/keys",
+        json={"action": "delete", "codes": ["CCCCCCCCCCCCCCCCCCCC"]},
+        headers={"X-Admin-Token": "testsecret123"},
+    )
+    check(
+        "удаление ключа по HTTP",
+        (response.get_json() or {}).get("delete", {}).get("removed") == 1,
+        response.get_data(as_text=True),
+    )
+
     shutil.rmtree(TMP, ignore_errors=True)
     print("\nИтого: %d ok, %d fail" % (PASSED, FAILED))
     return 1 if FAILED else 0

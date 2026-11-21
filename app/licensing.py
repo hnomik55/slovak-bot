@@ -162,7 +162,7 @@ def redeem(code: str, telegram_id: int) -> Tuple[bool, str]:
         return False, "Этот ключ отозван. Напиши в поддержку."
     if row.get("used_by"):
         if int(row["used_by"]) == int(telegram_id):
-            return False, "Этот ключ уже активирован на твоём аккаунте."
+            return True, "✅ Этот ключ уже активирован на твоём аккаунте — доступ открыт."
         return False, "Этот ключ уже использован другим человеком."
 
     days = int(row.get("days") or 0)
@@ -328,6 +328,32 @@ def import_codes(
         "existing": existing,
         "invalid": invalid,
     }
+
+
+def delete_codes(codes: Iterable[str]) -> Dict[str, int]:
+    """Удаляет ключи (например, тестовые или ошибочно залитую партию).
+
+    Вместе с ключом удаляется подписка, которая на нём висит.
+    """
+    removed = 0
+    subs = 0
+    for raw in codes:
+        code = _valid_code(raw)
+        if not code:
+            continue
+        row = db.query_one("SELECT id FROM licenses WHERE code = ?", (code,))
+        if not row:
+            continue
+        linked = db.query_one(
+            "SELECT COUNT(*) AS n FROM subscriptions WHERE license_id = ?", (row["id"],)
+        ) or {"n": 0}
+        db.execute("DELETE FROM subscriptions WHERE license_id = ?", (row["id"],))
+        db.execute("DELETE FROM licenses WHERE id = ?", (row["id"],))
+        removed += 1
+        subs += int(linked["n"])
+    if removed:
+        snapshot()
+    return {"removed": removed, "subscriptions": subs}
 
 
 def apply_activation(code: str, telegram_id: int, activated_at: Optional[str] = None) -> bool:

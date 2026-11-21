@@ -365,6 +365,50 @@ async def main() -> int:
     )
     check("без ключа команды закрыты", "ключ" in session.last_text().lower(), session.last_text()[:120])
 
+    # Ключ без /start: состояние диалога живёт в памяти и может потеряться
+    cold = 425243
+    cold_user = {"id": cold, "is_bot": False, "first_name": "Холодный"}
+    cold_key = licensing.create_keys(1, 0, "flow-cold")[0]
+    uid += 1
+    await dp.feed_update(
+        BOT,
+        make_update(
+            uid,
+            {
+                "update_id": uid,
+                "message": {
+                    "message_id": uid,
+                    "date": int(datetime.now().timestamp()),
+                    "chat": {"id": cold, "type": "private"},
+                    "from": cold_user,
+                    "text": cold_key,
+                },
+            },
+        ),
+    )
+    check("ключ работает без /start", "✅" in session.last_text(), session.last_text()[:140])
+    check("доступ выдан без /start", licensing.is_active(cold))
+
+    # Повторный ввод того же ключа тем же человеком — не ошибка
+    uid += 1
+    await dp.feed_update(
+        BOT,
+        make_update(
+            uid,
+            {
+                "update_id": uid,
+                "message": {
+                    "message_id": uid,
+                    "date": int(datetime.now().timestamp()),
+                    "chat": {"id": cold, "type": "private"},
+                    "from": cold_user,
+                    "text": cold_key,
+                },
+            },
+        ),
+    )
+    check("доступ сохранился", licensing.is_active(cold))
+
     # Неверный ключ
     uid += 1
     await dp.feed_update(

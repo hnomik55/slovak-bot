@@ -22,6 +22,19 @@ log = logging.getLogger("license")
 ALLOWED_COMMANDS = ("/start", "/app", "/help", "/license", "/ключ")
 
 
+def looks_like_key(text: str) -> bool:
+    """Похоже ли сообщение на ключ доступа.
+
+    Ключ нового формата — 20 символов, старого — SLOV-XXXXX-XXXXX-XXXXX.
+    Нужно, чтобы ключ принимался и без предварительного /start: состояние
+    диалога живёт в памяти и теряется при перезапуске сервера.
+    """
+    candidate = (text or "").strip()
+    if not candidate or len(candidate) > 64:
+        return False
+    return bool(licensing.parse_codes(candidate)[:1])
+
+
 class LicenseGate(BaseMiddleware):
     async def __call__(
         self,
@@ -44,6 +57,9 @@ class LicenseGate(BaseMiddleware):
         if isinstance(event, Message):
             text = (event.text or "").strip().lower()
             if text.startswith(ALLOWED_COMMANDS):
+                return await handler(event, data)
+            # Ключ принимаем в любой момент, даже если человек не нажимал /start.
+            if looks_like_key(event.text or ""):
                 return await handler(event, data)
             await event.answer(
                 "🔑 Нужен ключ доступа. Пришли его сообщением — или нажми /start.",

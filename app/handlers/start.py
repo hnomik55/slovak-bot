@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 
 from aiogram import Bot, F, Router
-from aiogram.filters import Command, CommandStart
+from aiogram.filters import BaseFilter, Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import (
     CallbackQuery,
@@ -19,11 +19,22 @@ from app import db
 from app import licensing
 from app.config import CONFIG
 from app.keyboards import back_to, main_menu_with_app
+from app.middleware import looks_like_key
 from app.states import LicenseFlow
 from app.utils import plural
 
 log = logging.getLogger("start")
 router = Router(name="start")
+
+
+class KeyMessage(BaseFilter):
+    """Сообщение с ключом от человека, у которого ещё нет доступа."""
+
+    async def __call__(self, message: Message) -> bool:
+        user = message.from_user
+        if user and licensing.is_active(user.id):
+            return False
+        return looks_like_key(message.text or "")
 
 
 HELP = """<b>Как работать со мной</b>
@@ -113,7 +124,8 @@ async def msg_license_key(message: Message, bot: Bot, state: FSMContext) -> None
     ok, text = licensing.redeem(code, message.from_user.id)
     if not ok:
         await message.answer(
-            "❌ %s\n\nПопробуй ещё раз — ключ выглядит так: SLOV-XXXXX-XXXXX-XXXXX" % text,
+            "❌ %s\n\nКлюч — 20 символов: буквы, цифры и знаки. "
+            "Скопируй его целиком, без пробелов." % text,
             reply_markup=InlineKeyboardMarkup(
                 inline_keyboard=[
                     [InlineKeyboardButton(text="🔑 Ввести ключ", callback_data="nav:license")],
@@ -129,6 +141,12 @@ async def msg_license_key(message: Message, bot: Bot, state: FSMContext) -> None
         "%s\n\n%s" % (text, _license_footer(message.from_user.id)),
         reply_markup=main_menu_with_app(CONFIG.webapp_base_url),
     )
+
+
+@router.message(KeyMessage(), F.text)
+async def msg_license_key_without_start(message: Message, bot: Bot, state: FSMContext) -> None:
+    """Ключ, присланный без /start (состояние диалога могло потеряться)."""
+    await msg_license_key(message, bot, state)
 
 
 def _license_footer(user_id: int) -> str:

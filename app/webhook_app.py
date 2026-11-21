@@ -124,6 +124,12 @@ def create_app(bot: Bot, dp: Dispatcher) -> Flask:
         action = (data.get("action") or "stats").lower()
         if action == "export":
             return jsonify({"ok": True, "state": licensing_mod.export_state()})
+        if action == "delete":
+            codes = data.get("codes") or []
+            removed = licensing_mod.delete_codes(codes)
+            return jsonify(
+                {"ok": True, "delete": removed, "stats": licensing_mod.stats()}
+            )
         if action == "import":
             codes = data.get("codes")
             if not codes:

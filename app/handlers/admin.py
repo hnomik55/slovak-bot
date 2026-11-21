@@ -263,6 +263,19 @@ async def cmd_keys(message: Message) -> None:
         await message.answer("Ключ отозван." if ok else "Ключ не найден.")
         return
 
+    if action == "delete":
+        if len(args) < 3:
+            await message.answer("Формат: /admin_key delete <код>")
+            return
+        result = licensing.delete_codes(args[2:])
+        await message.answer(
+            "Удалено ключей: %d, подписок: %d."
+            % (result["removed"], result["subscriptions"])
+            if result["removed"]
+            else "Такого ключа нет."
+        )
+        return
+
     if action == "subs":
         rows = licensing.list_subscribers(30)
         if not rows:
